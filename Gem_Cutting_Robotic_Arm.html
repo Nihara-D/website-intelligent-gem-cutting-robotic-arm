@@ -20,13 +20,13 @@ nav {
   position:fixed; top:0; left:0; right:0; z-index:999;
   display:flex; align-items:center; justify-content:space-between;
   padding:1rem 3rem;
-  background:rgba(248,246,242,0.94); backdrop-filter:blur(14px);
+  background:rgba(248,246,242,0.96); backdrop-filter:blur(14px);
   border-bottom:1px solid var(--mid);
 }
 .nav-brand { display:flex; align-items:center; gap:0.6rem; font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--dark); text-decoration:none; }
-.nav-links { display:flex; gap:2rem; list-style:none; }
+.nav-links { display:flex; gap:1.8rem; list-style:none; align-items:center; }
 .nav-links a { font-size:0.85rem; color:var(--warm); text-decoration:none; transition:color 0.2s; }
-.nav-links a:hover { color:var(--dark); }
+.nav-links a:hover, .nav-links a.active { color:var(--dark); }
 
 /* HERO */
 #home {
@@ -93,13 +93,13 @@ h1.hero-title em { font-style:italic; color:var(--blue); }
 .tech-tag { font-size:0.72rem; padding:0.28rem 0.65rem; border:1px solid var(--mid); border-radius:3px; background:var(--white); color:var(--warm); transition:all 0.2s; }
 .tech-tag:hover { background:var(--blue); color:var(--white); border-color:var(--blue); }
 
-/* MODULES */
-#modules { background:var(--darker); padding:5.5rem 0; }
-#modules .sec { padding-top:0; padding-bottom:0; }
-#modules .eyebrow { color:#aaa; }
-#modules .eyebrow::before { background:#aaa; }
-#modules .sec-title { color:var(--white); }
-#modules .sec-lead { color:#888; }
+/* MODULES (sub-section within Domain) */
+.modules-sub { background:var(--darker); padding:5rem 0; margin-top:0; }
+.modules-sub .sec { padding-top:0; padding-bottom:0; }
+.modules-sub .eyebrow { color:#aaa; }
+.modules-sub .eyebrow::before { background:#aaa; }
+.modules-sub .sec-title { color:var(--white); }
+.modules-sub .sec-lead { color:#888; }
 .mod-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:rgba(255,255,255,0.07); margin-top:3rem; }
 .mod { background:var(--darker); padding:2.4rem; border:1px solid rgba(255,255,255,0.07); transition:background 0.25s; position:relative; }
 .mod:hover { background:#1e1a14; }
@@ -118,7 +118,21 @@ h1.hero-title em { font-style:italic; color:var(--blue); }
 
 /* MILESTONES */
 #milestones { background:var(--off); }
-.tl { position:relative; padding-left:1.5rem; margin-top:3rem; }
+.ms-dropdown-wrap { margin-top:2.5rem; }
+.ms-select-lbl { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; color:var(--stone); text-transform:uppercase; margin-bottom:0.6rem; display:block; }
+.ms-select {
+  width:100%; max-width:480px; padding:0.8rem 1.1rem;
+  font-family:'DM Sans',sans-serif; font-size:0.95rem; color:var(--dark);
+  background:var(--white); border:1px solid var(--mid); border-radius:4px;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a6a58' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 1rem center;
+  cursor:pointer; transition:border-color 0.2s; outline:none;
+}
+.ms-select:focus { border-color:var(--blue); }
+.ms-panel { display:none; margin-top:2rem; }
+.ms-panel.active { display:block; animation:fadeUp 0.3s ease; }
+.tl { position:relative; padding-left:1.5rem; }
 .tl::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(to bottom, var(--blue), var(--mid)); }
 .ms { position:relative; padding:0 0 2.6rem 2.5rem; }
 .ms::before { content:''; position:absolute; left:-5px; top:7px; width:10px; height:10px; border-radius:50%; background:var(--white); border:2px solid var(--mid); }
@@ -131,7 +145,23 @@ h1.hero-title em { font-style:italic; color:var(--blue); }
 .ba { background:#fef5e0; color:var(--topaz); }
 .bs { background:var(--light); color:var(--stone); }
 .ms-date { font-family:'DM Mono',monospace; font-size:0.63rem; color:var(--stone); margin-bottom:0.5rem; }
+.ms-marks { font-family:'DM Mono',monospace; font-size:0.63rem; color:var(--blue); margin-bottom:0.5rem; }
 .ms-desc { font-size:0.9rem; line-height:1.75; color:var(--warm); font-weight:300; max-width:580px; }
+
+/* All milestones view */
+.all-ms-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:2rem; }
+.ms-card {
+  padding:1.6rem 1.8rem; border:1px solid var(--mid); background:var(--white);
+  transition:all 0.2s; cursor:pointer;
+}
+.ms-card:hover { border-color:var(--blue); background:var(--off); transform:translateY(-2px); }
+.ms-card.done { border-left:3px solid var(--blue); }
+.ms-card.now { border-left:3px solid var(--topaz); }
+.ms-card.upcoming { border-left:3px solid var(--stone); opacity:0.7; }
+.ms-card-n { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--stone); margin-bottom:0.4rem; }
+.ms-card-title { font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--darker); margin-bottom:0.3rem; }
+.ms-card-meta { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--stone); margin-bottom:0.5rem; }
+.ms-card-desc { font-size:0.84rem; line-height:1.7; color:var(--warm); font-weight:300; }
 
 /* DOCUMENTS */
 #documents { background:var(--white); }
@@ -142,6 +172,7 @@ h1.hero-title em { font-style:italic; color:var(--blue); }
 .doc-name { font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--darker); }
 .doc-desc { font-size:0.84rem; line-height:1.7; color:var(--warm); font-weight:300; flex:1; }
 .doc-lnk { font-family:'DM Mono',monospace; font-size:0.64rem; color:var(--blue); }
+.doc-pending { font-family:'DM Mono',monospace; font-size:0.64rem; color:var(--stone); }
 
 /* SLIDES */
 #slides { background:var(--off); }
@@ -160,7 +191,7 @@ h1.hero-title em { font-style:italic; color:var(--blue); }
 .sup-lbl { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--stone); text-transform:uppercase; margin-bottom:0.3rem; }
 .sup-name { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--darker); margin-bottom:0.2rem; }
 .sup-dept { font-size:0.85rem; color:var(--warm); font-weight:300; }
-.sup-email { font-size:0.82rem; color:var(--blue); }
+.sup-email { font-size:0.82rem; color:var(--blue); text-decoration:none; }
 .team-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--mid); }
 .mem { background:var(--white); padding:1.8rem 1.4rem; text-align:center; transition:background 0.2s; }
 .mem:hover { background:var(--off); }
@@ -209,7 +240,7 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 @keyframes armJ1 { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(5deg)} }
 @keyframes armJ2 { 0%,100%{transform:rotate(4deg)} 50%{transform:rotate(-7deg)} }
 @keyframes armJ3 { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(5deg)} }
-@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 @keyframes scanLine { 0%,100%{opacity:0.15} 50%{opacity:0.5} }
 
 .floating { animation:float 6s ease-in-out infinite; }
@@ -231,6 +262,7 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
   .docs-grid { grid-template-columns:1fr 1fr; }
   .slides-grid { grid-template-columns:1fr 1fr; }
   .team-grid { grid-template-columns:1fr 1fr; }
+  .all-ms-grid { grid-template-columns:1fr; }
   .sec { padding:4rem 1.5rem; }
 }
 </style>
@@ -254,16 +286,15 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#domain">Domain</a></li>
-    <li><a href="#modules">Modules</a></li>
     <li><a href="#milestones">Milestones</a></li>
     <li><a href="#documents">Documents</a></li>
     <li><a href="#slides">Slides</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#about">About Us</a></li>
+    <li><a href="#contact">Contact Us</a></li>
   </ul>
 </nav>
 
-<!-- HERO -->
+<!-- HOME -->
 <section id="home">
   <div class="hero-dots"></div>
   <div>
@@ -283,143 +314,87 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
     </div>
   </div>
 
-  <!-- MAIN HERO SVG: Robot arm + gems -->
   <div class="hero-visual floating">
     <svg viewBox="0 0 480 520" xmlns="http://www.w3.org/2000/svg">
-      <!-- soft bg circle -->
       <circle cx="240" cy="270" r="210" fill="#f0ece4" opacity="0.7"/>
       <circle cx="240" cy="270" r="165" fill="#e8e2d8" opacity="0.45"/>
-
-      <!-- === ROBOTIC ARM === -->
-      <!-- Base plate -->
       <rect x="185" y="368" width="110" height="16" rx="5" fill="#3a3028"/>
       <rect x="200" y="354" width="80" height="18" rx="4" fill="#4a4038"/>
-      <!-- Base joint motor housing -->
       <ellipse cx="240" cy="352" rx="32" ry="12" fill="#5a5048"/>
-
-      <!-- J1 — base rotation body -->
       <g class="arm-j1">
         <rect x="226" y="268" width="28" height="88" rx="7" fill="#5a7faa"/>
-        <!-- joint cap top -->
         <ellipse cx="240" cy="268" rx="16" ry="7" fill="#6a8fba"/>
         <ellipse cx="240" cy="268" rx="8" ry="4" fill="#4a6f9a"/>
-        <!-- joint cap bottom -->
         <ellipse cx="240" cy="352" rx="16" ry="7" fill="#6a8fba"/>
       </g>
-
-      <!-- J2 — upper arm (shoulder) -->
       <g class="arm-j2">
         <rect x="228" y="195" width="24" height="78" rx="6" fill="#3a72c4"/>
         <ellipse cx="240" cy="195" rx="14" ry="6" fill="#4a82d4"/>
         <ellipse cx="240" cy="195" rx="7" ry="3.5" fill="#2a62b4"/>
         <ellipse cx="240" cy="268" rx="14" ry="6" fill="#4a82d4"/>
       </g>
-
-      <!-- J3 — forearm (elbow) -->
       <g class="arm-j3">
         <rect x="230" y="138" width="20" height="62" rx="5" fill="#2868b8"/>
         <ellipse cx="240" cy="138" rx="12" ry="5" fill="#3878c8"/>
         <ellipse cx="240" cy="138" rx="6" ry="3" fill="#1858a8"/>
         <ellipse cx="240" cy="195" rx="12" ry="5" fill="#3878c8"/>
-
-        <!-- Wrist housing -->
         <rect x="228" y="110" width="24" height="32" rx="5" fill="#2060b0"/>
-        <!-- Tool mount -->
         <rect x="234" y="85" width="12" height="28" rx="3" fill="#999"/>
-        <!-- Cutter spindle -->
         <rect x="237" y="62" width="6" height="26" rx="2" fill="#bbb"/>
-        <!-- Cutter tip -->
         <polygon points="237,62 243,62 240,50" fill="#ccc"/>
-        <!-- Cutter tip glow -->
         <ellipse cx="240" cy="50" rx="4" ry="3" fill="white" opacity="0.5"/>
       </g>
-
-      <!-- === MAIN GEM: Sapphire (being cut) === -->
       <g transform="translate(290,105)" class="gem-glow">
-        <!-- Main faceted sapphire -->
         <polygon points="50,4 82,20 82,48 50,64 18,48 18,20" fill="#1a4a9a" opacity="0.95"/>
-        <!-- Crown top facets -->
         <polygon points="50,4 82,20 50,26" fill="#5090e8"/>
         <polygon points="50,4 18,20 50,26" fill="#4080d8"/>
         <polygon points="82,20 82,48 50,26" fill="#2060c0"/>
         <polygon points="18,20 18,48 50,26" fill="#3070c8"/>
-        <!-- Pavilion -->
         <polygon points="82,48 82,54 50,68" fill="#0a3080"/>
         <polygon points="18,48 18,54 50,68" fill="#1040a0"/>
         <polygon points="82,54 50,68 50,88" fill="#081a60"/>
         <polygon points="18,54 50,68 50,88" fill="#0e2870"/>
-        <!-- Table highlight -->
         <polygon points="50,4 82,20 50,26 18,20" fill="white" opacity="0.08"/>
-        <!-- Sparkles on gem -->
         <circle class="sp" cx="62" cy="11" r="2.5" fill="white" opacity="0.9" style="animation-delay:0s"/>
         <circle class="sp" cx="38" cy="24" r="1.8" fill="white" opacity="0.75" style="animation-delay:0.5s"/>
         <circle class="sp" cx="70" cy="34" r="1.4" fill="white" opacity="0.85" style="animation-delay:1s"/>
         <circle class="sp" cx="32" cy="40" r="2" fill="white" opacity="0.7" style="animation-delay:1.4s"/>
         <text x="50" y="102" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8" fill="#7a6a58" letter-spacing="1.5">SAPPHIRE</text>
       </g>
-
-      <!-- Scanning beam from tool to gem -->
       <line class="scan" x1="240" y1="50" x2="320" y2="130" stroke="#3a80d8" stroke-width="1" stroke-dasharray="5 3"/>
       <line class="scan" x1="240" y1="56" x2="315" y2="140" stroke="#3a80d8" stroke-width="0.6" stroke-dasharray="3 5" style="animation-delay:0.5s"/>
-
-      <!-- === FLOATING GEMS === -->
-      <!-- Ruby (top-left) -->
+      <!-- Ruby -->
       <g transform="translate(55,72)">
-        <polygon points="26,3 45,14 45,34 26,44 7,34 7,14" fill="#c0392b" opacity="0.85"/>
-        <polygon points="26,3 45,14 26,22" fill="#e87060" opacity="0.9"/>
-        <polygon points="26,3 7,14 26,22" fill="#d86050" opacity="0.85"/>
-        <polygon points="45,34 26,44 26,22" fill="#a02820" opacity="0.9"/>
-        <polygon points="7,34 26,44 26,22" fill="#b03030" opacity="0.85"/>
-        <circle class="sp" cx="33" cy="9" r="2" fill="white" opacity="0.85" style="animation-delay:0.3s"/>
-        <text x="26" y="56" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#9b2335" letter-spacing="1">RUBY</text>
+        <polygon points="28,2 50,15 50,41 28,54 6,41 6,15" fill="#7a1a2a" opacity="0.9"/>
+        <polygon points="28,2 50,15 28,22" fill="#d04060"/>
+        <polygon points="28,2 6,15 28,22" fill="#c03050"/>
+        <polygon points="50,15 50,41 28,22" fill="#901828"/>
+        <polygon points="6,15 6,41 28,22" fill="#a02030"/>
+        <polygon points="50,41 50,46 28,58" fill="#501018"/>
+        <polygon points="6,41 6,46 28,58" fill="#681820"/>
+        <circle class="sp" cx="36" cy="8" r="1.8" fill="white" opacity="0.8" style="animation-delay:0.8s"/>
+        <text x="28" y="70" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">RUBY</text>
       </g>
-
-      <!-- Emerald (bottom-right) -->
-      <g transform="translate(345,318)">
-        <rect x="2" y="10" width="46" height="34" rx="2" fill="#1a7a4a" opacity="0.85"/>
-        <rect x="2" y="10" width="46" height="34" rx="2" fill="none" stroke="#1a6645" stroke-width="1"/>
-        <!-- Step cuts -->
-        <rect x="8" y="16" width="34" height="22" rx="1" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.7"/>
-        <rect x="14" y="20" width="22" height="14" rx="1" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.7"/>
-        <!-- top/bottom bevel -->
-        <rect x="8" y="2" width="34" height="10" rx="2" fill="#1a6a3a" opacity="0.8"/>
-        <rect x="8" y="42" width="34" height="10" rx="2" fill="#1a6a3a" opacity="0.8"/>
-        <!-- sides -->
-        <rect x="2" y="8" width="8" height="38" rx="2" fill="#158040" opacity="0.6"/>
-        <rect x="40" y="8" width="8" height="38" rx="2" fill="#158040" opacity="0.6"/>
-        <circle class="sp" cx="25" cy="27" r="3" fill="white" opacity="0.5" style="animation-delay:0.7s"/>
-        <text x="25" y="62" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#1a6645" letter-spacing="1">EMERALD</text>
+      <!-- Emerald -->
+      <g transform="translate(350,290)">
+        <rect x="4" y="8" width="50" height="42" rx="4" fill="#0e5030" opacity="0.9"/>
+        <rect x="4" y="8" width="50" height="12" rx="4" fill="#20804060"/>
+        <rect x="4" y="38" width="50" height="12" rx="4" fill="#0a381860"/>
+        <line x1="4" y1="20" x2="54" y2="20" stroke="#20a050" stroke-width="0.8" opacity="0.5"/>
+        <line x1="4" y1="38" x2="54" y2="38" stroke="#20a050" stroke-width="0.8" opacity="0.5"/>
+        <circle class="sp" cx="42" cy="14" r="1.5" fill="white" opacity="0.75" style="animation-delay:1.2s"/>
+        <text x="29" y="65" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">EMERALD</text>
       </g>
-
-      <!-- Topaz (top-right) -->
-      <g transform="translate(370,68)">
-        <polygon points="24,3 42,13 42,33 24,43 6,33 6,13" fill="#e89820" opacity="0.85"/>
-        <polygon points="24,3 42,13 24,21" fill="#f0b840" opacity="0.9"/>
-        <polygon points="24,3 6,13 24,21" fill="#e0a830" opacity="0.85"/>
-        <polygon points="42,33 24,43 24,21" fill="#c07810" opacity="0.9"/>
-        <polygon points="6,33 24,43 24,21" fill="#d08820" opacity="0.85"/>
-        <circle class="sp" cx="30" cy="9" r="2" fill="white" opacity="0.9" style="animation-delay:1.1s"/>
-        <text x="24" y="56" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#c8860a" letter-spacing="1">TOPAZ</text>
+      <!-- Topaz -->
+      <g transform="translate(60,320)">
+        <polygon points="28,4 52,18 52,44 28,58 4,44 4,18" fill="#a06008" opacity="0.85"/>
+        <polygon points="28,4 52,18 28,24" fill="#f0b040"/>
+        <polygon points="28,4 4,18 28,24" fill="#e0a030"/>
+        <polygon points="52,18 52,44 28,24" fill="#c07010"/>
+        <polygon points="4,18 4,44 28,24" fill="#d08020"/>
+        <circle class="sp" cx="38" cy="10" r="1.5" fill="white" opacity="0.85" style="animation-delay:0.3s"/>
+        <text x="28" y="70" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">TOPAZ</text>
       </g>
-
-      <!-- Moonstone (bottom-left) -->
-      <g transform="translate(42,320)">
-        <ellipse cx="28" cy="24" rx="26" ry="22" fill="#dde8f8" opacity="0.8"/>
-        <ellipse cx="28" cy="24" rx="26" ry="22" fill="none" stroke="#b0c8e8" stroke-width="1"/>
-        <ellipse cx="22" cy="18" rx="10" ry="7" fill="white" opacity="0.35" transform="rotate(-20,22,18)"/>
-        <circle class="sp" cx="20" cy="16" r="3" fill="white" opacity="0.6" style="animation-delay:0.2s"/>
-        <text x="28" y="56" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#7a8aaa" letter-spacing="0.5">MOONSTONE</text>
-      </g>
-
-      <!-- Decorative sparkle stars -->
-      <text class="sp" x="130" y="190" font-size="14" fill="#c8860a" opacity="0.6" style="animation-delay:0.2s">✦</text>
-      <text class="sp" x="390" y="210" font-size="10" fill="#1e4a8a" opacity="0.5" style="animation-delay:0.8s">✦</text>
-      <text class="sp" x="155" y="410" font-size="9" fill="#9b2335" opacity="0.5" style="animation-delay:1.5s">✦</text>
-      <text class="sp" x="430" y="160" font-size="11" fill="#1a6645" opacity="0.5" style="animation-delay:0.5s">✦</text>
-      <text class="sp" x="78" y="240" font-size="8" fill="#c8860a" opacity="0.4" style="animation-delay:1.8s">✦</text>
-
-      <!-- Bottom label -->
-      <text x="240" y="490" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#b8a898" letter-spacing="1">5-DOF · ROS 2 Jazzy · MoveIt 2 · Gazebo Harmonic</text>
     </svg>
   </div>
 </section>
@@ -429,31 +404,31 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 <!-- DOMAIN -->
 <section id="domain" style="background:var(--white);">
   <div class="sec reveal">
+    <div class="eyebrow">02 · Domain</div>
+    <h2 class="sec-title">Research <em>Domain</em></h2>
+    <p class="sec-lead">Exploring the intersection of computer vision, machine learning, and robotics to automate the centuries-old craft of gemstone cutting for Sri Lanka's gem industry.</p>
     <div class="domain-grid">
       <div>
-        <div class="eyebrow">02 · Domain</div>
-        <h2 class="sec-title">Research <em>Foundation</em></h2>
-        <p class="sec-lead">Grounded in robotics, machine learning, and Sri Lankan gemology — addressing a real gap in end-to-end gem manufacturing systems.</p>
         <div class="domain-cards">
           <div class="dcard">
             <div class="dcard-lbl">Literature Survey</div>
-            <div class="dcard-title">State of the Art</div>
-            <p class="dcard-body">Multi-DOF robotic manipulators, ROS middleware, and ML-based gemstone classification using RI, SG, and hardness are well-established. Deep learning improves defect detection consistency over manual inspection.</p>
+            <div class="dcard-title">Prior Work & Context</div>
+            <p class="dcard-body">Reviewed 60+ papers on gem classification (CNN/SVM approaches), robotic manipulation (ROS-based systems), defect detection in materials science, and GIA cutting standards. Sri Lanka's gem industry processes over 90% of the world's blue sapphires, yet cutting remains entirely manual.</p>
           </div>
           <div class="dcard">
             <div class="dcard-lbl">Research Gap</div>
             <div class="dcard-title">What's Missing</div>
-            <p class="dcard-body">No existing system integrates gemstone identification, defect evaluation, cut recommendation, and robotic execution in one unified pipeline — especially for Sri Lankan gem types.</p>
+            <p class="dcard-body">No existing system integrates gemstone identification, defect evaluation, cut recommendation, and robotic execution in one unified pipeline — especially for Sri Lankan gem types such as Blue Sapphire, Spinel, and Moonstone.</p>
           </div>
           <div class="dcard">
             <div class="dcard-lbl">Research Problem</div>
             <div class="dcard-title">Core Challenge</div>
-            <p class="dcard-body">Traditional gem cutting is expert-dependent, inconsistent, and non-scalable. Sri Lanka's gem industry needs intelligent automation that maintains quality while reducing material waste and training costs.</p>
+            <p class="dcard-body">Traditional gem cutting is expert-dependent, inconsistent, and non-scalable. Sri Lanka's gem industry needs intelligent automation that maintains quality while reducing material waste and cutting time.</p>
           </div>
           <div class="dcard">
             <div class="dcard-lbl">Methodology</div>
             <div class="dcard-title">Our Approach</div>
-            <p class="dcard-body">Multimodal fusion (EfficientNetB3 + physical constants), ensemble defect classifiers, two-stage CatBoost/XGBoost cut planning, and ROS 2 robotic execution via D–H kinematic modeling.</p>
+            <p class="dcard-body">Multimodal fusion (EfficientNetB3 + physical constants), ensemble defect classifiers, two-stage CatBoost/XGBoost cut planning, and ROS 2 robotic execution via D–H kinematic modelling through a complete integrated pipeline.</p>
           </div>
         </div>
         <div class="tech-wrap">
@@ -480,27 +455,19 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
           <li class="obj-item"><span class="obj-n">III</span><span class="obj-t">Design a two-stage CatBoost/XGBoost cut-type recommendation pipeline predicting crown, pavilion, table, and depth parameters aligned with GIA standards.</span></li>
           <li class="obj-item"><span class="obj-n">IV</span><span class="obj-t">Implement a ROS 2-based robotic execution framework with Gazebo simulation, MoveIt 2 planning, and Sim-to-Real translation via ESP32-S3 and PCA9685.</span></li>
         </ul>
-
-        <!-- Gem anatomy diagram -->
         <div style="margin-top:2rem; padding:1.8rem 1.6rem; background:var(--off); border:1px solid var(--mid);">
           <div class="tech-hd" style="margin-bottom:1.2rem;">Gemstone Cut Anatomy</div>
           <svg viewBox="0 0 300 195" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
-            <!-- Gem outline -->
             <polygon points="90,42 210,42 240,82 150,172 60,82" fill="#e8f2fb" stroke="#1e4a8a" stroke-width="1.2"/>
-            <!-- Table -->
             <line x1="90" y1="42" x2="210" y2="42" stroke="#1e4a8a" stroke-width="2.5"/>
-            <!-- Crown facets -->
             <polygon points="90,42 210,42 240,82 150,82 60,82" fill="#c8e0f8" stroke="#1e4a8a" stroke-width="0.8" opacity="0.7"/>
             <line x1="150" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
             <line x1="90" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
             <line x1="210" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
-            <!-- Girdle line -->
             <line x1="60" y1="82" x2="240" y2="82" stroke="#888" stroke-width="1.5" stroke-dasharray="5 3"/>
-            <!-- Pavilion -->
             <polygon points="60,82 240,82 150,172" fill="#b8d4f5" stroke="#1e4a8a" stroke-width="0.8" opacity="0.8"/>
             <line x1="60" y1="82" x2="150" y2="172" stroke="#1e4a8a" stroke-width="0.5" opacity="0.3"/>
             <line x1="240" y1="82" x2="150" y2="172" stroke="#1e4a8a" stroke-width="0.5" opacity="0.3"/>
-            <!-- Labels -->
             <line x1="150" y1="42" x2="150" y2="22" stroke="#b8a898" stroke-width="0.8"/>
             <text x="152" y="20" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Table</text>
             <line x1="65" y1="60" x2="30" y2="55" stroke="#b8a898" stroke-width="0.8"/>
@@ -511,10 +478,8 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
             <text x="2" y="129" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Pavilion</text>
             <line x1="150" y1="172" x2="150" y2="185" stroke="#b8a898" stroke-width="0.8"/>
             <text x="128" y="193" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Culet</text>
-            <!-- Crown angle -->
             <path d="M82,82 A18,18 0 0 1 96,67" stroke="#c8860a" stroke-width="1.2" fill="none"/>
             <text x="48" y="76" font-family="'DM Mono',monospace" font-size="8" fill="#c8860a">crown∠</text>
-            <!-- Depth indicator -->
             <line x1="252" y1="42" x2="252" y2="172" stroke="#9b2335" stroke-width="0.8"/>
             <polygon points="248,47 256,47 252,42" fill="#9b2335"/>
             <polygon points="248,167 256,167 252,172" fill="#9b2335"/>
@@ -526,16 +491,13 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
   </div>
 </section>
 
-<div class="divhr"></div>
-
-<!-- MODULES -->
-<section id="modules">
-  <div class="sec" style="padding-top:5.5rem;padding-bottom:5.5rem;">
-    <div class="eyebrow">03 · System Modules</div>
+<!-- SYSTEM MODULES (part of Domain) -->
+<div class="modules-sub">
+  <div class="sec reveal">
+    <div class="eyebrow">02b · System Modules</div>
     <h2 class="sec-title" style="color:var(--white);">Four Integrated <em>Components</em></h2>
     <p class="sec-lead">Each module feeds into the next — from gem identification to robotic execution — completing a full pipeline in ~3.2 seconds per gemstone.</p>
-    <div class="mod-grid reveal">
-      <!-- Module 1 -->
+    <div class="mod-grid">
       <div class="mod m1">
         <div class="mod-n">MODULE 01</div>
         <div class="mod-icon">
@@ -554,8 +516,13 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
         <div class="mod-title">Robotic Arm Control</div>
         <p class="mod-body">5-DOF physical prototype with MG996R servos, ESP32-S3, and Raspberry Pi 5 running ROS 2 Jazzy. 6-DOF Gazebo/MoveIt 2 simulation validated for collision-free trajectory planning using D–H kinematics.</p>
         <span class="mod-badge mb-b">±0.4 mm precision</span>
+        <div style="margin-top:1rem;">
+          <a href="https://github.com/Nihara-D/manipulator_phyisical" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:0.68rem;color:#7fb3f5;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#7fb3f5"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+            manipulator_phyisical ↗
+          </a>
+        </div>
       </div>
-      <!-- Module 2 -->
       <div class="mod m2">
         <div class="mod-n">MODULE 02</div>
         <div class="mod-icon">
@@ -573,7 +540,6 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
         <p class="mod-body">EfficientNetB3 visual features fused with RI, SG, and Mohs hardness constants. Trained on 10,000 samples across 34 Sri Lankan gem types — natural, treated, synthetic, and imitation stones.</p>
         <span class="mod-badge mb-r">92% accuracy</span>
       </div>
-      <!-- Module 3 -->
       <div class="mod m3">
         <div class="mod-n">MODULE 03</div>
         <div class="mod-icon">
@@ -590,7 +556,6 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
         <p class="mod-body">Soft Voting Ensemble (Random Forest, Extra Trees, Gradient Boosting, SVM) for 8-class defect detection using 168-dimensional handcrafted features. HX711 load cell for weight measurement and value estimation.</p>
         <span class="mod-badge mb-g">F1 = 0.88 ± 0.013</span>
       </div>
-      <!-- Module 4 -->
       <div class="mod m4">
         <div class="mod-n">MODULE 04</div>
         <div class="mod-icon">
@@ -612,41 +577,119 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <div class="divhr"></div>
 
 <!-- MILESTONES -->
 <section id="milestones" style="background:var(--off);">
   <div class="sec reveal">
-    <div class="eyebrow">04 · Milestones</div>
+    <div class="eyebrow">03 · Milestones</div>
     <h2 class="sec-title">Project <em>Timeline</em></h2>
-    <p class="sec-lead">Five assessment checkpoints tracking the research from initial proposal through to final viva.</p>
-    <div class="tl">
-      <div class="ms done">
-        <div class="ms-head"><div class="ms-name">Project Proposal</div><span class="ms-badge bd">Complete</span></div>
-        <div class="ms-date">Assessment 01</div>
-        <p class="ms-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved by the SLIIT research panel.</p>
+    <p class="sec-lead">Five assessment checkpoints tracking the research from initial proposal through to final viva. Use the dropdown to view details for each milestone.</p>
+
+    <div class="ms-dropdown-wrap">
+      <label class="ms-select-lbl" for="msSelect">Select a milestone to view details</label>
+      <select class="ms-select" id="msSelect" onchange="showMilestone(this.value)">
+        <option value="">— Choose an assessment —</option>
+        <option value="all">All Milestones (Overview)</option>
+        <option value="ms1">Project Proposal · Assessment 01</option>
+        <option value="ms2">Progress Presentation I · Assessment 02</option>
+        <option value="ms3">Progress Presentation II · Assessment 03</option>
+        <option value="ms4">Final Assessment · Assessment 04</option>
+        <option value="ms5">Viva Voce · Assessment 05</option>
+      </select>
+    </div>
+
+    <!-- All Overview -->
+    <div id="panel-all" class="ms-panel">
+      <div class="all-ms-grid">
+        <div class="ms-card done" onclick="selectMs('ms1')">
+          <div class="ms-card-n">ASSESSMENT 01</div>
+          <div class="ms-card-title">Project Proposal</div>
+          <div class="ms-card-meta">Marks Allocated: 10% · Status: Complete</div>
+          <p class="ms-card-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved.</p>
+        </div>
+        <div class="ms-card done" onclick="selectMs('ms2')">
+          <div class="ms-card-n">ASSESSMENT 02</div>
+          <div class="ms-card-title">Progress Presentation I</div>
+          <div class="ms-card-meta">Marks Allocated: 15% · Status: Complete</div>
+          <p class="ms-card-desc">Early system architecture, robotic arm hardware assembly, initial model training, and Gazebo simulation setup.</p>
+        </div>
+        <div class="ms-card done" onclick="selectMs('ms3')">
+          <div class="ms-card-n">ASSESSMENT 03</div>
+          <div class="ms-card-title">Progress Presentation II</div>
+          <div class="ms-card-meta">Marks Allocated: 20% · Status: Complete</div>
+          <p class="ms-card-desc">Full pipeline integration with 92% identification accuracy, F1 0.88 defect detection, 84% cut family prediction, and ROS 2 trajectory execution.</p>
+        </div>
+        <div class="ms-card now" onclick="selectMs('ms4')">
+          <div class="ms-card-n">ASSESSMENT 04</div>
+          <div class="ms-card-title">Final Assessment</div>
+          <div class="ms-card-meta">Marks Allocated: 40% · Status: In Progress</div>
+          <p class="ms-card-desc">Complete system demonstration with all four modules integrated. IEEE-format research paper submission.</p>
+        </div>
+        <div class="ms-card upcoming" onclick="selectMs('ms5')">
+          <div class="ms-card-n">ASSESSMENT 05</div>
+          <div class="ms-card-title">Viva Voce</div>
+          <div class="ms-card-meta">Marks Allocated: 15% · Status: Upcoming</div>
+          <p class="ms-card-desc">Oral examination assessing individual research contributions, technical depth, and future research directions.</p>
+        </div>
       </div>
-      <div class="ms done">
-        <div class="ms-head"><div class="ms-name">Progress Presentation I</div><span class="ms-badge bd">Complete</span></div>
-        <div class="ms-date">Assessment 02</div>
-        <p class="ms-desc">Demonstrated early system architecture, robotic arm hardware assembly (5-DOF prototype), initial gemstone identification model training, and Gazebo simulation setup with RViz visualization.</p>
+    </div>
+
+    <!-- MS1 -->
+    <div id="panel-ms1" class="ms-panel">
+      <div class="tl">
+        <div class="ms done">
+          <div class="ms-head"><div class="ms-name">Project Proposal</div><span class="ms-badge bd">Complete</span></div>
+          <div class="ms-date">Assessment 01</div>
+          <div class="ms-marks">Marks Allocated: 10%</div>
+          <p class="ms-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved by the SLIIT research panel. Deliverables included the Project Charter, initial proposal document, and signed supervisor agreement.</p>
+        </div>
       </div>
-      <div class="ms done">
-        <div class="ms-head"><div class="ms-name">Progress Presentation II</div><span class="ms-badge bd">Complete</span></div>
-        <div class="ms-date">Assessment 03</div>
-        <p class="ms-desc">Full pipeline integration: 92% identification accuracy, F1 0.88 defect detection, 84% cut family prediction, and ROS 2 trajectory execution verified across 50 test runs on 8 gemstone types.</p>
+    </div>
+    <!-- MS2 -->
+    <div id="panel-ms2" class="ms-panel">
+      <div class="tl">
+        <div class="ms done">
+          <div class="ms-head"><div class="ms-name">Progress Presentation I</div><span class="ms-badge bd">Complete</span></div>
+          <div class="ms-date">Assessment 02</div>
+          <div class="ms-marks">Marks Allocated: 15%</div>
+          <p class="ms-desc">Demonstrated early system architecture, robotic arm hardware assembly (5-DOF prototype), initial gemstone identification model training, and Gazebo simulation setup with RViz visualization. Presented dataset collection methodology and preliminary accuracy results.</p>
+        </div>
       </div>
-      <div class="ms now">
-        <div class="ms-head"><div class="ms-name">Final Assessment</div><span class="ms-badge ba">In Progress</span></div>
-        <div class="ms-date">Assessment 04</div>
-        <p class="ms-desc">Complete system demonstration with all four modules integrated. Final IEEE-format research paper submission covering results across Blue Sapphire, Ruby, Spinel, Moonstone, Alexandrite, Garnet, Topaz, and Quartz.</p>
+    </div>
+    <!-- MS3 -->
+    <div id="panel-ms3" class="ms-panel">
+      <div class="tl">
+        <div class="ms done">
+          <div class="ms-head"><div class="ms-name">Progress Presentation II</div><span class="ms-badge bd">Complete</span></div>
+          <div class="ms-date">Assessment 03</div>
+          <div class="ms-marks">Marks Allocated: 20%</div>
+          <p class="ms-desc">Full pipeline integration: 92% identification accuracy, F1 0.88 defect detection, 84% cut family prediction, and ROS 2 trajectory execution verified across 50 test runs on 8 gemstone types. All four modules demonstrated end-to-end.</p>
+        </div>
       </div>
-      <div class="ms">
-        <div class="ms-head"><div class="ms-name">Viva Voce</div><span class="ms-badge bs">Upcoming</span></div>
-        <div class="ms-date">Assessment 05</div>
-        <p class="ms-desc">Oral examination assessing individual research contributions, technical depth, and future research directions before the SLIIT examination panel.</p>
+    </div>
+    <!-- MS4 -->
+    <div id="panel-ms4" class="ms-panel">
+      <div class="tl">
+        <div class="ms now">
+          <div class="ms-head"><div class="ms-name">Final Assessment</div><span class="ms-badge ba">In Progress</span></div>
+          <div class="ms-date">Assessment 04</div>
+          <div class="ms-marks">Marks Allocated: 40%</div>
+          <p class="ms-desc">Complete system demonstration with all four modules integrated. Final IEEE-format research paper submission covering results across Blue Sapphire, Ruby, Spinel, Moonstone, Alexandrite, Garnet, Topaz, and Quartz. Includes four individual research documents per team member.</p>
+        </div>
+      </div>
+    </div>
+    <!-- MS5 -->
+    <div id="panel-ms5" class="ms-panel">
+      <div class="tl">
+        <div class="ms">
+          <div class="ms-head"><div class="ms-name">Viva Voce</div><span class="ms-badge bs">Upcoming</span></div>
+          <div class="ms-date">Assessment 05</div>
+          <div class="ms-marks">Marks Allocated: 15%</div>
+          <p class="ms-desc">Oral examination assessing individual research contributions, technical depth, and future research directions before the SLIIT examination panel. Each team member presents and defends their individual module contribution.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -657,16 +700,46 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 <!-- DOCUMENTS -->
 <section id="documents" style="background:var(--white);">
   <div class="sec reveal">
-    <div class="eyebrow">05 · Documents</div>
+    <div class="eyebrow">04 · Documents</div>
     <h2 class="sec-title">Research <em>Documents</em></h2>
-    <p class="sec-lead">All project deliverables, research papers, and supporting documentation produced throughout the research.</p>
+    <p class="sec-lead">All project deliverables, research papers, and supporting documentation produced throughout the research lifecycle.</p>
     <div class="docs-grid">
-      <a class="doc" href="#"><div class="doc-type">PDF · Charter</div><div class="doc-name">Project Charter</div><p class="doc-desc">Formal initiation document outlining scope, team, supervisor, and deliverables for RP-25J-231.</p><span class="doc-lnk">↗ View document</span></a>
-      <a class="doc" href="#"><div class="doc-type">PDF · Proposal</div><div class="doc-name">Proposal Document</div><p class="doc-desc">Detailed research proposal: literature review, methodology, objectives, and project timeline.</p><span class="doc-lnk">↗ View document</span></a>
-      <a class="doc" href="#"><div class="doc-type">DOC · Checklist</div><div class="doc-name">Check List Documents</div><p class="doc-desc">Assessment checklists and evaluation criteria for each milestone as per SLIIT research guidelines.</p><span class="doc-lnk">↗ View document</span></a>
-      <a class="doc" href="#"><div class="doc-type">PDF · Research Paper</div><div class="doc-name">Research Paper</div><p class="doc-desc">IEEE-format paper: "A Semi-Autonomous Robotic System for Multimodal Gemstone Identification, Defect-Aware Evaluation, and 3D Cut Planning."</p><span class="doc-lnk">↗ View document</span></a>
-      <a class="doc" href="#"><div class="doc-type">DOC · Individual</div><div class="doc-name">Final Documents — Individual</div><p class="doc-desc">Individual research documentation for each team member's contribution across the four project modules.</p><span class="doc-lnk">⋯ Pending</span></a>
-      <a class="doc" href="#"><div class="doc-type">PDF · Ethics</div><div class="doc-name">Ethics Clearance</div><p class="doc-desc">Official ethical clearance from SLIIT and data collection approval from the Gem and Jewellery Research and Training Institute (GJRTI).</p><span class="doc-lnk">↗ View document</span></a>
+      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC5ykAj7Kq2RroZjxYwoKlbAUDkG9w029KH0wcD4cLaAuw?e=fMEh5X" target="_blank" rel="noopener">
+        <div class="doc-type">PDF · Proposal</div>
+        <div class="doc-name">Individual &amp; Proposal Reports</div>
+        <p class="doc-desc">Individual research reports and the formal proposal document covering literature review, methodology, objectives, and project timeline for RP-25J-231.</p>
+        <span class="doc-lnk">↗ Open in SharePoint</span>
+      </a>
+      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgB6IQtxYt1xTrfwGwE_aA_SAfBfd-rxH1xWLs-FR65PFcA?e=1BeK8e" target="_blank" rel="noopener">
+        <div class="doc-type">DOC · Checklists</div>
+        <div class="doc-name">Check List Documents</div>
+        <p class="doc-desc">Assessment checklists and evaluation criteria for each milestone as per SLIIT research guidelines.</p>
+        <span class="doc-lnk">↗ Open in SharePoint</span>
+      </a>
+      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC8IO-S5XaHSbIRlb-4sD9PAdhWy4HhMZ8pva-9AiXIjtk?e=6IgyKT" target="_blank" rel="noopener">
+        <div class="doc-type">PDF · Final Reports</div>
+        <div class="doc-name">Final Reports — Individual &amp; Main</div>
+        <p class="doc-desc">IEEE-format main research paper plus individual final documents for each team member covering their respective project module contributions.</p>
+        <span class="doc-lnk">↗ Open in SharePoint</span>
+      </a>
+      <a class="doc" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+        <div class="doc-type">GitHub · Full Project</div>
+        <div class="doc-name">Full Project Repository</div>
+        <p class="doc-desc">Complete source code for the intelligent gem cutting robotic arm research — all four modules, datasets, training scripts, and ROS 2 workspace.</p>
+        <span class="doc-lnk">↗ View on GitHub</span>
+      </a>
+      <a class="doc" href="https://github.com/Nihara-D/manipulator_phyisical" target="_blank" rel="noopener">
+        <div class="doc-type">GitHub · Robotic Arm</div>
+        <div class="doc-name">Robotic Arm Control Repository</div>
+        <p class="doc-desc">Physical manipulator control code — ESP32-S3, ROS 2 Jazzy, MoveIt 2, servo drivers, and D–H kinematic implementation for the 5-DOF prototype.</p>
+        <span class="doc-lnk">↗ View on GitHub</span>
+      </a>
+      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC5ykAj7Kq2RroZjxYwoKlbAUDkG9w029KH0wcD4cLaAuw?e=fMEh5X" target="_blank" rel="noopener">
+        <div class="doc-type">PDF · Ethics</div>
+        <div class="doc-name">Ethics Clearance</div>
+        <p class="doc-desc">Official ethical clearance from SLIIT and data collection approval from the Gem and Jewellery Research and Training Institute (GJRTI).</p>
+        <span class="doc-lnk">↗ Open in SharePoint</span>
+      </a>
     </div>
   </div>
 </section>
@@ -676,11 +749,11 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 <!-- SLIDES -->
 <section id="slides" style="background:var(--off);">
   <div class="sec reveal">
-    <div class="eyebrow">06 · Presentations</div>
+    <div class="eyebrow">05 · Presentations</div>
     <h2 class="sec-title">Presentation <em>Slides</em></h2>
-    <p class="sec-lead">Slide decks from each assessment presentation, with the final presentation to be added.</p>
+    <p class="sec-lead">Slide decks from each assessment presentation. Upcoming presentations will be added once conducted.</p>
     <div class="slides-grid">
-      <a class="scard" href="#">
+      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgASiTz936MYRIArwobf3gnNAenbU1TIXIqzMQ2LU7Qhqw0?e=Di7Ue2" target="_blank" rel="noopener">
         <div class="sthumb" style="background:linear-gradient(135deg,#e8f0fb,#d0e4f8);">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
             <polygon points="32,6 54,19 54,45 32,58 10,45 10,19" fill="none" stroke="#1e4a8a" stroke-width="1.5"/>
@@ -691,9 +764,9 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
             <circle cx="40" cy="13" r="3.5" fill="white" opacity="0.7"/>
           </svg>
         </div>
-        <div class="sbody"><div class="stitle">Proposal Presentation</div><div class="ssub">Assessment 01 · Initial Submission</div></div>
+        <div class="sbody"><div class="stitle">Proposal &amp; PP1 Slides</div><div class="ssub">Assessment 01 &amp; 02 · SharePoint</div></div>
       </a>
-      <a class="scard" href="#">
+      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgCK9BIC_-7RRo5OuBAzsP61AWvBkgpkB10TJsFZfD3Z98g?e=AIsst3" target="_blank" rel="noopener">
         <div class="sthumb" style="background:linear-gradient(135deg,#fbeaea,#f5d0d0);">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
             <rect x="10" y="34" width="12" height="24" rx="2" fill="#c0392b80"/>
@@ -701,9 +774,9 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
             <rect x="42" y="10" width="12" height="48" rx="2" fill="#c0392b"/>
           </svg>
         </div>
-        <div class="sbody"><div class="stitle">Progress Presentation I</div><div class="ssub">Assessment 02 · Mid-Term</div></div>
+        <div class="sbody"><div class="stitle">Progress Presentation II</div><div class="ssub">Assessment 03 · SharePoint</div></div>
       </a>
-      <a class="scard" href="#">
+      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgDghz0tXtwMTqXFVnTRHz7gAf--aFsQBQcrF_BEkJotnRg?e=9HnFgS" target="_blank" rel="noopener">
         <div class="sthumb" style="background:linear-gradient(135deg,#e8f5ee,#d0ecd8);">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
             <circle cx="32" cy="32" r="22" fill="none" stroke="#1a6645" stroke-width="1.5"/>
@@ -711,19 +784,18 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
             <path d="M54,32 A22,22 0 0 1 32,54" fill="#1a664530"/>
             <path d="M32,54 A22,22 0 0 1 10,32" fill="#1a664520"/>
             <path d="M10,32 A22,22 0 0 1 32,10" fill="#1a664510"/>
-            <text x="32" y="36" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#1a6645">91.4%</text>
+            <text x="32" y="36" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#1a6645">Final</text>
           </svg>
         </div>
-        <div class="sbody"><div class="stitle">Progress Presentation II</div><div class="ssub">Assessment 03 · Pipeline Results</div></div>
+        <div class="sbody"><div class="stitle">Final Presentation</div><div class="ssub">Assessment 04 · SharePoint</div></div>
       </a>
-      <a class="scard" href="#" style="opacity:0.55;pointer-events:none;">
-        <div class="sthumb" style="background:var(--light);">
+      <a class="scard" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+        <div class="sthumb" style="background:linear-gradient(135deg,#1a1510,#2c2418);">
           <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <rect x="16" y="16" width="32" height="32" rx="5" fill="none" stroke="#b8a898" stroke-width="1.5" stroke-dasharray="5 3"/>
-            <text x="32" y="36" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#b8a898">Upcoming</text>
+            <path d="M32 8C18.7 8 8 18.7 8 32c0 10.6 6.9 19.6 16.4 22.8 1.2.2 1.6-.5 1.6-1.2v-4.2c-6.7 1.5-8.1-3.2-8.1-3.2-1.1-2.8-2.7-3.5-2.7-3.5-2.2-1.5.2-1.5.2-1.5 2.4.2 3.7 2.5 3.7 2.5 2.1 3.6 5.6 2.6 6.9 2 .2-1.5.8-2.6 1.5-3.2-5.3-.6-10.9-2.7-10.9-11.9 0-2.6.9-4.8 2.5-6.4-.2-.6-1.1-3.1.2-6.4 0 0 2-.6 6.6 2.5 1.9-.5 4-.8 6-.8s4.1.3 6 .8c4.6-3.1 6.6-2.5 6.6-2.5 1.3 3.3.5 5.8.2 6.4 1.5 1.7 2.5 3.8 2.5 6.4 0 9.2-5.6 11.2-11 11.8.9.8 1.6 2.3 1.6 4.6v6.8c0 .7.4 1.4 1.7 1.2C49.1 51.6 56 42.6 56 32 56 18.7 45.3 8 32 8z" fill="white" opacity="0.85"/>
           </svg>
         </div>
-        <div class="sbody"><div class="stitle">Final Presentation</div><div class="ssub">Assessment 04 · Coming Soon</div></div>
+        <div class="sbody"><div class="stitle">Full Project Repo</div><div class="ssub">GitHub · All Modules</div></div>
       </a>
     </div>
   </div>
@@ -731,10 +803,10 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 
 <div class="divhr"></div>
 
-<!-- ABOUT -->
+<!-- ABOUT US -->
 <section id="about" style="background:var(--white);">
   <div class="sec reveal">
-    <div class="eyebrow">07 · About Us</div>
+    <div class="eyebrow">06 · About Us</div>
     <h2 class="sec-title">Meet the <em>Team</em></h2>
     <p class="sec-lead">Final year students from the Department of Information Technology, Sri Lanka Institute of Information Technology (SLIIT), Malabe.</p>
     <div class="sup-row">
@@ -747,10 +819,30 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
       </div>
     </div>
     <div class="team-grid">
-      <div class="mem"><div class="mem-av" style="background:#1e4a8a;">N</div><div class="mem-name">Nihara Randini Dayarathne</div><div class="mem-id">IT22581198</div><a class="mem-email" href="mailto:it22581198@my.sliit.lk">it22581198@my.sliit.lk</a></div>
-      <div class="mem"><div class="mem-av" style="background:#9b2335;">L</div><div class="mem-name">Lakshi Tharushika</div><div class="mem-id">IT22570130</div><a class="mem-email" href="mailto:it22570130@my.sliit.lk">it22570130@my.sliit.lk</a></div>
-      <div class="mem"><div class="mem-av" style="background:#1a6645;">S</div><div class="mem-name">Shashikala Beddegamage</div><div class="mem-id">IT22565112</div><a class="mem-email" href="mailto:it22565112@my.sliit.lk">it22565112@my.sliit.lk</a></div>
-      <div class="mem"><div class="mem-av" style="background:#c8860a;">S</div><div class="mem-name">Shashikala Dilrukshi</div><div class="mem-id">IT22607850</div><a class="mem-email" href="mailto:it22607850@my.sliit.lk">it22607850@my.sliit.lk</a></div>
+      <div class="mem">
+        <div class="mem-av" style="background:#1e4a8a;">N</div>
+        <div class="mem-name">Nihara Randini Dayarathne</div>
+        <div class="mem-id">IT22581198</div>
+        <a class="mem-email" href="mailto:it22581198@my.sliit.lk">it22581198@my.sliit.lk</a>
+      </div>
+      <div class="mem">
+        <div class="mem-av" style="background:#9b2335;">L</div>
+        <div class="mem-name">Lakshi Tharushika</div>
+        <div class="mem-id">IT22570130</div>
+        <a class="mem-email" href="mailto:it22570130@my.sliit.lk">it22570130@my.sliit.lk</a>
+      </div>
+      <div class="mem">
+        <div class="mem-av" style="background:#1a6645;">S</div>
+        <div class="mem-name">Shashikala Beddegamage</div>
+        <div class="mem-id">IT22565112</div>
+        <a class="mem-email" href="mailto:it22565112@my.sliit.lk">it22565112@my.sliit.lk</a>
+      </div>
+      <div class="mem">
+        <div class="mem-av" style="background:#c8860a;">S</div>
+        <div class="mem-name">Shashikala Dilrukshi</div>
+        <div class="mem-id">IT22607850</div>
+        <a class="mem-email" href="mailto:it22607850@my.sliit.lk">it22607850@my.sliit.lk</a>
+      </div>
     </div>
     <div class="about-note">This project is conducted under the <strong style="font-weight:500;color:var(--dark);">Autonomous Intelligent Machines and Systems (AIMS)</strong> research group at SLIIT. Ethical clearance was obtained from SLIIT, with data collection support approved by the <strong style="font-weight:500;color:var(--dark);">Gem and Jewellery Research and Training Institute (GJRTI)</strong>. All data collected is strictly limited to research purposes and is non-commercial.</div>
   </div>
@@ -758,11 +850,11 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 
 <div class="divhr"></div>
 
-<!-- CONTACT -->
+<!-- CONTACT US -->
 <section id="contact">
   <div class="sec reveal">
     <div>
-      <div class="eyebrow">08 · Contact</div>
+      <div class="eyebrow">07 · Contact Us</div>
       <h2 class="sec-title" style="color:var(--white);">Get in <em>Touch</em></h2>
       <p class="c-p">We welcome collaborations, feedback, and questions about this research. Reach us via the form or through the contact details below.</p>
       <div class="cdetail">
@@ -772,6 +864,7 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
         <div class="crow"><span class="clbl">Research</span><span class="cval">AIMS Research Group</span></div>
         <div class="crow"><span class="clbl">Supervisor</span><span class="cval">harshanath.s@sliit.lk</span></div>
         <div class="crow"><span class="clbl">Portal</span><span class="cval">cdap.sliit.lk</span></div>
+        <div class="crow"><span class="clbl">GitHub</span><span class="cval"><a href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.7);text-decoration:none;">intelligent-gem-cutting-robot-arm-research ↗</a></span></div>
       </div>
     </div>
     <div class="cform">
@@ -786,10 +879,17 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
 
 <footer>
   <div class="fl">💎 Intelligent Gem Cutting Robotic Arm · SLIIT 2024–2026</div>
-  <div class="fr">© 2024–2026 SLIIT AIMS Research Group · RP-25J-231</div>
+  <div style="display:flex;gap:1.4rem;align-items:center;">
+    <a href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.07em;color:rgba(255,255,255,0.35);text-decoration:none;display:flex;align-items:center;gap:0.35rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,255,255,0.35)"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+      Full Project Repo
+    </a>
+    <div class="fr">© 2024–2026 SLIIT AIMS Research Group · RP-25J-231</div>
+  </div>
 </footer>
 
 <script>
+// Reveal on scroll
 const els = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver(entries => {
   entries.forEach((e,i) => {
@@ -798,13 +898,31 @@ const io = new IntersectionObserver(entries => {
 }, {threshold:0.07});
 els.forEach(el => io.observe(el));
 
+// Active nav link
 const secs = document.querySelectorAll('section[id]');
 const links = document.querySelectorAll('.nav-links a');
 window.addEventListener('scroll', () => {
   let cur='';
   secs.forEach(s=>{ if(window.scrollY >= s.offsetTop-130) cur=s.id; });
-  links.forEach(a=>{ a.style.color = a.getAttribute('href')==='#'+cur ? 'var(--dark)' : ''; });
+  links.forEach(a=>{ a.classList.toggle('active', a.getAttribute('href')==='#'+cur); });
 });
+
+// Milestone dropdown
+function showMilestone(val) {
+  document.querySelectorAll('.ms-panel').forEach(p => p.classList.remove('active'));
+  if(!val) return;
+  const panel = document.getElementById('panel-' + val);
+  if(panel) panel.classList.add('active');
+}
+
+// Click on overview card to show detail
+function selectMs(id) {
+  const sel = document.getElementById('msSelect');
+  sel.value = id;
+  showMilestone(id);
+  document.getElementById('milestones').scrollIntoView({behavior:'smooth'});
+}
 </script>
 </body>
 </html>
+
