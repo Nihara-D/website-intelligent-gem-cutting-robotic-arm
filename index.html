@@ -3,487 +3,964 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Intelligent Gem Cutting Robotic Arm | SLIIT</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<title>Intelligent Gem Cutting Robotic Arm · SLIIT RP-25J-231</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Space+Grotesk:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-:root {
-  --white:#ffffff; --off:#f8f6f2; --light:#f0ece4; --mid:#e2d9cc;
-  --stone:#b8a898; --warm:#7a6a58; --dark:#2c2418; --darker:#1a1510;
-  --blue:#1e4a8a; --blue-l:#2d6ab8; --ruby:#9b2335; --emerald:#1a6645; --topaz:#c8860a;
+/* ═══════════════════════════════════════════════════════ ROOT */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+  --ink:#0a0806;--ink2:#1a1410;--ink3:#2a221a;
+  --cream:#fdf9f4;--warm:#f5eede;--mist:#e8dfd0;
+  --stone:#b0988a;--clay:#8a7060;--bark:#5a4838;
+  --sapphire:#1e4fa8;--sap-l:#4a80e0;--sap-xl:#7aaef8;
+  --ruby:#8b1a2a;--rub-l:#c83050;--rub-xl:#f07090;
+  --emerald:#0e5a38;--em-l:#1a9060;--em-xl:#4abe88;
+  --topaz:#b87800;--top-l:#e0a820;--top-xl:#f8d060;
+  --amethyst:#5a1a8a;--am-l:#9040c8;--am-xl:#c880f0;
+  --gold:#c8a040;
+  --glow-sap:rgba(30,79,168,0.4);
+  --glow-rub:rgba(139,26,42,0.4);
+  --glow-em:rgba(14,90,56,0.4);
+  --glow-top:rgba(184,120,0,0.4);
 }
-body { font-family:'DM Sans',sans-serif; background:var(--off); color:var(--dark); overflow-x:hidden; }
-
-/* NAV */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:999;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:1rem 3rem;
-  background:rgba(248,246,242,0.96); backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--mid);
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--ink);color:var(--cream);
+  overflow-x:hidden;cursor:none;
 }
-.nav-brand { display:flex; align-items:center; gap:0.6rem; font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--dark); text-decoration:none; }
-.nav-links { display:flex; gap:1.8rem; list-style:none; align-items:center; }
-.nav-links a { font-size:0.85rem; color:var(--warm); text-decoration:none; transition:color 0.2s; }
-.nav-links a:hover, .nav-links a.active { color:var(--dark); }
 
-/* HERO */
-#home {
-  min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
-  align-items:center; padding:7rem 3rem 4rem; gap:4rem;
-  background:linear-gradient(150deg, var(--off) 55%, #f0ece4 100%);
-  position:relative; overflow:hidden;
+.team-av {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #ddd;
 }
-.hero-dots {
-  position:absolute; inset:0; pointer-events:none; opacity:0.035;
-  background-image:radial-gradient(circle, var(--dark) 1px, transparent 1px);
-  background-size:28px 28px;
+/* ═══════════════════════════════════════════════════════ CUSTOM CURSOR */
+.cursor{
+  position:fixed;width:12px;height:12px;
+  background:var(--sap-xl);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transition:transform 0.15s ease,background 0.2s ease,width 0.2s ease,height 0.2s ease;
+  mix-blend-mode:screen;
 }
-.eyebrow {
-  font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.14em;
-  color:var(--blue); text-transform:uppercase; margin-bottom:1.2rem;
-  display:inline-flex; align-items:center; gap:0.6rem;
+.cursor-ring{
+  position:fixed;width:40px;height:40px;
+  border:1px solid rgba(122,174,248,0.4);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94),width 0.2s,height 0.2s;
 }
-.eyebrow::before { content:''; width:22px; height:1px; background:var(--blue); display:inline-block; }
-h1.hero-title {
-  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,4.5vw,4rem);
-  line-height:1.12; font-weight:700; color:var(--darker); margin-bottom:1.4rem;
+body:hover .cursor{opacity:1;}
+
+/* ═══════════════════════════════════════════════════════ FALLING GEMS CANVAS */
+#gemCanvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:0.65;
 }
-h1.hero-title em { font-style:italic; color:var(--blue); }
-.hero-desc { font-size:1.05rem; line-height:1.85; color:var(--warm); font-weight:300; max-width:480px; margin-bottom:2.2rem; }
-.hero-tags { display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:2.4rem; }
-.tag { font-size:0.74rem; padding:0.32rem 0.8rem; border-radius:100px; border:1px solid var(--mid); background:var(--white); color:var(--warm); }
-.tag.b { background:#e8f0fb; border-color:#b8d0f0; color:var(--blue); }
-.tag.r { background:#fbeaea; border-color:#f0b8b8; color:var(--ruby); }
-.tag.g { background:#e8f5ee; border-color:#b8dfc8; color:var(--emerald); }
-.hero-stats { display:flex; gap:2rem; flex-wrap:wrap; }
-.hstat { border-left:2px solid var(--mid); padding-left:1rem; }
-.hstat-n { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--darker); display:block; line-height:1; }
-.hstat-l { font-size:0.72rem; color:var(--stone); }
 
-/* HERO VISUAL */
-.hero-visual { display:flex; align-items:center; justify-content:center; position:relative; }
-.hero-visual svg { width:100%; max-width:460px; }
-
-/* SECTIONS */
-.sec { padding:5.5rem 3rem; max-width:1160px; margin:0 auto; }
-.sec-title { font-family:'Playfair Display',serif; font-size:clamp(1.9rem,3.5vw,2.9rem); line-height:1.15; color:var(--darker); margin-bottom:0.8rem; }
-.sec-title em { font-style:italic; color:var(--blue); }
-.sec-lead { font-size:1rem; line-height:1.85; color:var(--warm); font-weight:300; max-width:620px; margin-bottom:3rem; }
-.divhr { width:100%; height:1px; background:var(--mid); }
-
-/* DOMAIN */
-#domain { background:var(--white); }
-.domain-grid { display:grid; grid-template-columns:1fr 1fr; gap:4.5rem; }
-.domain-cards { display:flex; flex-direction:column; gap:1px; margin-bottom:2rem; background:var(--mid); }
-.dcard { background:var(--off); padding:1.6rem 1.8rem; transition:background 0.2s,border-left 0.2s; border-left:3px solid transparent; }
-.dcard:hover { background:var(--white); border-left-color:var(--blue); }
-.dcard-lbl { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; color:var(--blue); text-transform:uppercase; margin-bottom:0.4rem; }
-.dcard-title { font-family:'Playfair Display',serif; font-size:1.1rem; margin-bottom:0.4rem; color:var(--darker); }
-.dcard-body { font-size:0.87rem; line-height:1.75; color:var(--warm); font-weight:300; }
-.obj-list { list-style:none; display:flex; flex-direction:column; gap:0.8rem; }
-.obj-item { display:flex; gap:1rem; align-items:flex-start; padding:1.1rem 1.2rem; background:var(--off); border:1px solid var(--mid); transition:border-color 0.2s; }
-.obj-item:hover { border-color:var(--blue); }
-.obj-n { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--blue); opacity:0.3; line-height:1; flex-shrink:0; }
-.obj-t { font-size:0.87rem; line-height:1.7; color:var(--warm); font-weight:300; }
-.tech-wrap { margin-top:2rem; padding:1.6rem; background:var(--off); border:1px solid var(--mid); }
-.tech-hd { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; color:var(--stone); text-transform:uppercase; margin-bottom:0.8rem; }
-.tech-tags { display:flex; flex-wrap:wrap; gap:0.4rem; }
-.tech-tag { font-size:0.72rem; padding:0.28rem 0.65rem; border:1px solid var(--mid); border-radius:3px; background:var(--white); color:var(--warm); transition:all 0.2s; }
-.tech-tag:hover { background:var(--blue); color:var(--white); border-color:var(--blue); }
-
-/* MODULES (sub-section within Domain) */
-.modules-sub { background:var(--darker); padding:5rem 0; margin-top:0; }
-.modules-sub .sec { padding-top:0; padding-bottom:0; }
-.modules-sub .eyebrow { color:#aaa; }
-.modules-sub .eyebrow::before { background:#aaa; }
-.modules-sub .sec-title { color:var(--white); }
-.modules-sub .sec-lead { color:#888; }
-.mod-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:rgba(255,255,255,0.07); margin-top:3rem; }
-.mod { background:var(--darker); padding:2.4rem; border:1px solid rgba(255,255,255,0.07); transition:background 0.25s; position:relative; }
-.mod:hover { background:#1e1a14; }
-.mod::before { content:''; position:absolute; top:0; left:0; width:100%; height:2px; }
-.m1::before { background:var(--blue-l); } .m2::before { background:var(--ruby); }
-.m3::before { background:var(--emerald); } .m4::before { background:var(--topaz); }
-.mod-n { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; color:#666; margin-bottom:0.8rem; }
-.mod-icon { margin-bottom:1rem; }
-.mod-title { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--white); margin-bottom:0.7rem; }
-.mod-body { font-size:0.87rem; line-height:1.78; color:#888; font-weight:300; margin-bottom:1.2rem; }
-.mod-badge { display:inline-block; font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.35rem 0.75rem; border-radius:4px; }
-.mb-b { background:rgba(45,106,184,0.25); color:#7fb3f5; }
-.mb-r { background:rgba(155,35,53,0.25); color:#f5a0a8; }
-.mb-g { background:rgba(26,102,69,0.25); color:#7fdbb0; }
-.mb-t { background:rgba(200,134,10,0.25); color:#f5cc7f; }
-
-/* MILESTONES */
-#milestones { background:var(--off); }
-.ms-dropdown-wrap { margin-top:2.5rem; }
-.ms-select-lbl { font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.12em; color:var(--stone); text-transform:uppercase; margin-bottom:0.6rem; display:block; }
-.ms-select {
-  width:100%; max-width:480px; padding:0.8rem 1.1rem;
-  font-family:'DM Sans',sans-serif; font-size:0.95rem; color:var(--dark);
-  background:var(--white); border:1px solid var(--mid); border-radius:4px;
-  appearance:none; -webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237a6a58' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-position:right 1rem center;
-  cursor:pointer; transition:border-color 0.2s; outline:none;
+.supervisor {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #020202;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
-.ms-select:focus { border-color:var(--blue); }
-.ms-panel { display:none; margin-top:2rem; }
-.ms-panel.active { display:block; animation:fadeUp 0.3s ease; }
-.tl { position:relative; padding-left:1.5rem; }
-.tl::before { content:''; position:absolute; left:0; top:0; bottom:0; width:1px; background:linear-gradient(to bottom, var(--blue), var(--mid)); }
-.ms { position:relative; padding:0 0 2.6rem 2.5rem; }
-.ms::before { content:''; position:absolute; left:-5px; top:7px; width:10px; height:10px; border-radius:50%; background:var(--white); border:2px solid var(--mid); }
-.ms.done::before { background:var(--blue); border-color:var(--blue); }
-.ms.now::before { background:var(--topaz); border-color:var(--topaz); box-shadow:0 0 0 4px rgba(200,134,10,0.18); }
-.ms-head { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.3rem; }
-.ms-name { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--darker); }
-.ms-badge { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.08em; text-transform:uppercase; padding:0.18rem 0.5rem; border-radius:3px; }
-.bd { background:#e8f5ee; color:var(--emerald); }
-.ba { background:#fef5e0; color:var(--topaz); }
-.bs { background:var(--light); color:var(--stone); }
-.ms-date { font-family:'DM Mono',monospace; font-size:0.63rem; color:var(--stone); margin-bottom:0.5rem; }
-.ms-marks { font-family:'DM Mono',monospace; font-size:0.63rem; color:var(--blue); margin-bottom:0.5rem; }
-.ms-desc { font-size:0.9rem; line-height:1.75; color:var(--warm); font-weight:300; max-width:580px; }
 
-/* All milestones view */
-.all-ms-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:2rem; }
-.ms-card {
-  padding:1.6rem 1.8rem; border:1px solid var(--mid); background:var(--white);
-  transition:all 0.2s; cursor:pointer;
+.avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
 }
-.ms-card:hover { border-color:var(--blue); background:var(--off); transform:translateY(-2px); }
-.ms-card.done { border-left:3px solid var(--blue); }
-.ms-card.now { border-left:3px solid var(--topaz); }
-.ms-card.upcoming { border-left:3px solid var(--stone); opacity:0.7; }
-.ms-card-n { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--stone); margin-bottom:0.4rem; }
-.ms-card-title { font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--darker); margin-bottom:0.3rem; }
-.ms-card-meta { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--stone); margin-bottom:0.5rem; }
-.ms-card-desc { font-size:0.84rem; line-height:1.7; color:var(--warm); font-weight:300; }
 
-/* DOCUMENTS */
-#documents { background:var(--white); }
-.docs-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--mid); margin-top:3rem; }
-.doc { background:var(--white); padding:1.8rem; text-decoration:none; color:inherit; transition:background 0.2s; display:flex; flex-direction:column; gap:0.7rem; }
-.doc:hover { background:var(--off); }
-.doc-type { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--stone); }
-.doc-name { font-family:'Playfair Display',serif; font-size:1.05rem; color:var(--darker); }
-.doc-desc { font-size:0.84rem; line-height:1.7; color:var(--warm); font-weight:300; flex:1; }
-.doc-lnk { font-family:'DM Mono',monospace; font-size:0.64rem; color:var(--blue); }
-.doc-pending { font-family:'DM Mono',monospace; font-size:0.64rem; color:var(--stone); }
-
-/* SLIDES */
-#slides { background:var(--off); }
-.slides-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; margin-top:3rem; }
-.scard { border:1px solid var(--mid); background:var(--white); overflow:hidden; transition:all 0.25s; text-decoration:none; color:inherit; display:block; }
-.scard:hover { box-shadow:0 8px 30px rgba(0,0,0,0.09); transform:translateY(-3px); }
-.sthumb { height:130px; display:flex; align-items:center; justify-content:center; }
-.sbody { padding:1.1rem; }
-.stitle { font-family:'Playfair Display',serif; font-size:0.98rem; color:var(--darker); margin-bottom:0.25rem; }
-.ssub { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--stone); }
-
-/* ABOUT */
-#about { background:var(--white); }
-.sup-row { display:flex; align-items:center; gap:2rem; padding:1.8rem 2rem; background:var(--off); border:1px solid var(--mid); margin-bottom:2.5rem; }
-.sup-av { width:62px; height:62px; border-radius:50%; background:var(--blue); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--white); flex-shrink:0; }
-.sup-lbl { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--stone); text-transform:uppercase; margin-bottom:0.3rem; }
-.sup-name { font-family:'Playfair Display',serif; font-size:1.25rem; color:var(--darker); margin-bottom:0.2rem; }
-.sup-dept { font-size:0.85rem; color:var(--warm); font-weight:300; }
-.sup-email { font-size:0.82rem; color:var(--blue); text-decoration:none; }
-.team-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--mid); }
-.mem { background:var(--white); padding:1.8rem 1.4rem; text-align:center; transition:background 0.2s; }
-.mem:hover { background:var(--off); }
-.mem-av { width:56px; height:56px; border-radius:50%; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--white); }
-.mem-name { font-family:'Playfair Display',serif; font-size:0.98rem; color:var(--darker); margin-bottom:0.25rem; }
-.mem-id { font-family:'DM Mono',monospace; font-size:0.6rem; color:var(--stone); margin-bottom:0.4rem; }
-.mem-email { font-size:0.74rem; color:var(--blue); text-decoration:none; word-break:break-all; }
-.about-note { margin-top:2rem; padding:1.4rem 1.8rem; background:var(--off); border:1px solid var(--mid); font-size:0.9rem; line-height:1.8; color:var(--warm); font-weight:300; }
-
-/* CONTACT */
-#contact { background:var(--darker); padding:5.5rem 0; }
-#contact .sec { display:grid; grid-template-columns:1fr 1fr; gap:4.5rem; }
-#contact .eyebrow { color:#999; } #contact .eyebrow::before { background:#999; }
-#contact .sec-title { color:var(--white); }
-.c-p { font-size:0.94rem; line-height:1.85; color:#888; font-weight:300; margin-bottom:2rem; max-width:380px; }
-.cdetail { display:flex; flex-direction:column; }
-.crow { display:flex; gap:1rem; align-items:flex-start; padding:0.85rem 0; border-bottom:1px solid rgba(255,255,255,0.07); }
-.clbl { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:#666; text-transform:uppercase; min-width:88px; padding-top:0.12rem; }
-.cval { font-size:0.87rem; color:rgba(255,255,255,0.7); }
-.cform { display:flex; flex-direction:column; gap:1.1rem; }
-.cfg { display:flex; flex-direction:column; gap:0.4rem; }
-.cflbl { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:#666; }
-.cfinput, .cftxt {
-  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-  color:var(--white); font-family:'DM Sans',sans-serif; font-size:0.9rem;
-  padding:0.72rem 0.95rem; outline:none; border-radius:4px; width:100%; transition:border-color 0.2s;
+.rcard-ref {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  font-size: 13px;
+  color: #555;
 }
-.cfinput:focus, .cftxt:focus { border-color:rgba(255,255,255,0.3); }
-.cftxt { min-height:105px; resize:vertical; }
-.cfbtn {
-  background:var(--white); border:none; color:var(--darker);
-  font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:500;
-  padding:0.85rem 2rem; cursor:pointer; border-radius:4px; align-self:flex-start; transition:all 0.25s;
+
+.rcard-ref ol {
+  margin: 6px 0 0 18px;
+  padding: 0;
 }
-.cfbtn:hover { background:var(--blue); color:var(--white); }
 
-/* FOOTER */
-footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); padding:1.4rem 3rem; display:flex; justify-content:space-between; align-items:center; }
-.fl { font-family:'Playfair Display',serif; font-size:0.88rem; color:rgba(255,255,255,0.35); }
-.fr { font-family:'DM Mono',monospace; font-size:0.58rem; letter-spacing:0.07em; color:rgba(255,255,255,0.2); }
+.rcard-ref li {
+  margin-bottom: 4px;
+}
+/* ═══════════════════════════════════════════════════════ NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.2rem 3.5rem;
+  background:rgba(10,8,6,0.75);backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-gem{
+  display:flex;align-items:center;gap:0.75rem;
+  font-family:'Cormorant Garamond',serif;font-size:1.15rem;
+  color:var(--cream);text-decoration:none;letter-spacing:0.02em;
+}
+.nav-gem span{color:var(--sap-xl);font-style:italic;}
+.nav-links{display:flex;gap:2.2rem;list-style:none;align-items:center;}
+.nav-links a{
+  font-family:'Space Mono',monospace;font-size:0.62rem;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--stone);text-decoration:none;
+  transition:color 0.25s,letter-spacing 0.25s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;
+  background:var(--sap-xl);transition:width 0.3s ease;
+}
+.nav-links a:hover{color:var(--cream);letter-spacing:0.18em;}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.nav-links a.active{color:var(--sap-xl);}
 
-/* ANIMATIONS */
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes sparkle { 0%,100%{opacity:0.15;transform:scale(0.85)} 50%{opacity:1;transform:scale(1)} }
-@keyframes gemGlow { 0%,100%{filter:drop-shadow(0 4px 16px rgba(30,74,138,0.15))} 50%{filter:drop-shadow(0 4px 36px rgba(30,74,138,0.45))} }
-@keyframes armJ1 { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(5deg)} }
-@keyframes armJ2 { 0%,100%{transform:rotate(4deg)} 50%{transform:rotate(-7deg)} }
-@keyframes armJ3 { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(5deg)} }
-@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-@keyframes scanLine { 0%,100%{opacity:0.15} 50%{opacity:0.5} }
+/* ═══════════════════════════════════════════════════════ HERO */
+#home{
+  min-height:100vh;position:relative;z-index:1;
+  display:flex;align-items:center;
+  padding:0 3.5rem;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:-1;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 50%, rgba(30,79,168,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(139,26,42,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 85% 15%, rgba(14,90,56,0.05) 0%, transparent 50%),
+    var(--ink);
+}
+.hero-grid-lines{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+.hero-content{max-width:700px;position:relative;z-index:2;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--sap-xl);margin-bottom:2rem;
+  padding:0.4rem 1rem;border:1px solid rgba(122,174,248,0.25);
+  border-radius:100px;background:rgba(30,79,168,0.1);
+}
+.hero-badge::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--sap-xl);animation:pulse 2s ease-in-out infinite;
+}
+h1.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,6vw,5.5rem);line-height:1.04;
+  font-weight:300;color:var(--cream);margin-bottom:1.6rem;
+  letter-spacing:-0.01em;
+}
+h1.hero-title .line2{
+  font-weight:600;font-style:italic;
+  background:linear-gradient(135deg,var(--sap-xl),var(--em-xl),var(--top-xl));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+h1.hero-title .line3{font-weight:300;color:rgba(255,255,255,0.5);}
+.hero-desc{
+  font-size:1.05rem;line-height:1.9;
+  color:rgba(255,255,255,0.45);font-weight:300;
+  max-width:560px;margin-bottom:2.5rem;
+  border-left:2px solid rgba(122,174,248,0.3);
+  padding-left:1.2rem;
+}
+.hero-stats-row{display:flex;gap:3rem;flex-wrap:wrap;margin-bottom:3rem;}
+.hstat{position:relative;}
+.hstat-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:600;line-height:1;
+  background:linear-gradient(135deg,var(--cream),var(--sap-xl));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;display:block;
+}
+.hstat-l{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;color:var(--stone);text-transform:uppercase;margin-top:0.3rem;}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.85rem 2rem;border-radius:4px;
+  background:var(--sap-xl);color:var(--ink);
+  font-family:'Space Mono',monospace;font-size:0.72rem;
+  letter-spacing:0.1em;font-weight:700;text-decoration:none;
+  text-transform:uppercase;transition:all 0.3s;border:none;cursor:pointer;
+}
+.btn-primary:hover{background:var(--cream);transform:translateY(-2px);box-shadow:0 12px 40px rgba(122,174,248,0.3);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.85rem 2rem;border-radius:4px;
+  border:1px solid rgba(255,255,255,0.15);color:var(--cream);
+  font-family:'Space Mono',monospace;font-size:0.72rem;
+  letter-spacing:0.1em;font-weight:400;text-decoration:none;
+  text-transform:uppercase;transition:all 0.3s;background:transparent;cursor:pointer;
+}
+.btn-ghost:hover{border-color:rgba(122,174,248,0.5);background:rgba(122,174,248,0.05);transform:translateY(-2px);}
 
-.floating { animation:float 6s ease-in-out infinite; }
-.gem-glow { animation:gemGlow 3.5s ease-in-out infinite; }
-.sp { animation:sparkle 2s ease-in-out infinite; }
-.arm-j1 { animation:armJ1 5s ease-in-out infinite; transform-origin:240px 340px; }
-.arm-j2 { animation:armJ2 5s 0.6s ease-in-out infinite; transform-origin:240px 255px; }
-.arm-j3 { animation:armJ3 5s 1.2s ease-in-out infinite; transform-origin:240px 185px; }
-.scan { animation:scanLine 3s ease-in-out infinite; }
+/* Hero 3D gem visual */
+.hero-visual-wrap{
+  position:absolute;right:-2rem;top:50%;transform:translateY(-50%);
+  width:min(52vw,680px);height:min(52vw,680px);
+  pointer-events:none;
+}
+.gem-orbit{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.04);
+  animation:orbit-spin 30s linear infinite;
+}
+.gem-orbit.inner{inset:20%;border-color:rgba(122,174,248,0.08);animation-duration:20s;animation-direction:reverse;}
+.gem-orbit.mid{inset:10%;border-color:rgba(255,255,255,0.04);animation-duration:25s;}
+.orbit-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;
+  top:50%;left:0;transform:translate(-50%,-50%);
+  background:var(--sap-xl);box-shadow:0 0 10px var(--sap-xl);
+}
+.center-gem{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  animation:gem-float 7s ease-in-out infinite,gem-rotate 20s linear infinite;
+}
+.gem-ring-label{
+  position:absolute;font-family:'Space Mono',monospace;
+  font-size:0.55rem;letter-spacing:0.15em;color:rgba(255,255,255,0.25);
+  text-transform:uppercase;white-space:nowrap;
+}
 
-.reveal { opacity:0; transform:translateY(24px); transition:opacity 0.65s, transform 0.65s; }
-.reveal.show { opacity:1; transform:none; }
+/* ═══════════════════════════════════════════════════════ SECTION BASE */
+.section{padding:7rem 3.5rem;position:relative;z-index:1;}
+.section-inner{max-width:1180px;margin:0 auto;}
+.eyebrow{
+  font-family:'Space Mono',monospace;font-size:0.58rem;
+  letter-spacing:0.2em;color:var(--sap-xl);text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:0.7rem;margin-bottom:1.4rem;
+}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--sap-xl);}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.1;
+  font-weight:300;color:var(--cream);margin-bottom:1rem;
+}
+.sec-title em{font-style:italic;font-weight:600;color:var(--sap-xl);}
+.sec-lead{
+  font-size:1rem;line-height:1.9;
+  color:rgba(255,255,255,0.4);font-weight:300;
+  max-width:600px;margin-bottom:4rem;
+}
 
-@media(max-width:900px){
-  nav { padding:1rem 1.5rem; }
-  .nav-links { display:none; }
-  #home { grid-template-columns:1fr; padding:6rem 1.5rem 3rem; }
-  .domain-grid,.mod-grid,#contact .sec { grid-template-columns:1fr; gap:2.5rem; }
-  .docs-grid { grid-template-columns:1fr 1fr; }
-  .slides-grid { grid-template-columns:1fr 1fr; }
-  .team-grid { grid-template-columns:1fr 1fr; }
-  .all-ms-grid { grid-template-columns:1fr; }
-  .sec { padding:4rem 1.5rem; }
+/* ═══════════════════════════════════════════════════════ DOMAIN */
+#domain{background:var(--ink2);}
+.domain-split{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+.research-cards{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,0.06);}
+.rcard{
+  background:var(--ink2);padding:2rem 2.2rem;
+  border-left:2px solid transparent;
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.rcard::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(30,79,168,0.04),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.rcard:hover{background:rgba(255,255,255,0.025);border-left-color:var(--sap-xl);}
+.rcard:hover::before{opacity:1;}
+.rcard-tag{
+  font-family:'Space Mono',monospace;font-size:0.55rem;
+  letter-spacing:0.15em;color:var(--sap-xl);text-transform:uppercase;
+  margin-bottom:0.5rem;display:block;
+}
+.rcard-title{
+  font-family:'Cormorant Garamond',serif;font-size:1.3rem;
+  font-weight:600;color:var(--cream);margin-bottom:0.5rem;
+}
+.rcard-body{font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.4);font-weight:300;}
+
+/* Objectives */
+.obj-stack{display:flex;flex-direction:column;gap:1.2rem;}
+.obj{
+  display:grid;grid-template-columns:3rem 1fr;gap:1rem;
+  padding:1.4rem;border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.02);
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.obj::after{
+  content:'';position:absolute;bottom:0;left:0;height:1px;width:0;
+  background:linear-gradient(90deg,var(--sap-xl),transparent);
+  transition:width 0.5s ease;
+}
+.obj:hover{border-color:rgba(122,174,248,0.2);background:rgba(30,79,168,0.06);}
+.obj:hover::after{width:100%;}
+.obj-n{
+  font-family:'Cormorant Garamond',serif;font-size:2rem;
+  font-weight:300;color:rgba(122,174,248,0.25);line-height:1;align-self:start;
+}
+.obj-t{font-size:0.9rem;line-height:1.75;color:rgba(255,255,255,0.5);font-weight:300;}
+.obj-t strong{color:rgba(255,255,255,0.85);font-weight:500;}
+
+/* Tech cloud */
+.tech-cloud{margin-top:2.5rem;padding:2rem;border:1px solid rgba(255,255,255,0.07);}
+.tech-cloud-title{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;color:var(--stone);text-transform:uppercase;margin-bottom:1.2rem;}
+.tech-tags-wrap{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.tech-pill{
+  font-family:'Space Mono',monospace;font-size:0.62rem;
+  padding:0.3rem 0.75rem;border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);border-radius:3px;
+  transition:all 0.25s;cursor:default;
+}
+.tech-pill:hover{
+  border-color:var(--sap-xl);color:var(--sap-xl);
+  background:rgba(30,79,168,0.1);transform:translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════ MODULES */
+#modules{background:var(--ink);overflow:hidden;position:relative;}
+.modules-noise{
+  position:absolute;inset:0;opacity:0.03;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.mod-showcase{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:4rem;background:rgba(255,255,255,0.04);}
+.mod-card{
+  background:var(--ink);padding:3rem;
+  position:relative;overflow:hidden;
+  transition:background 0.4s;
+}
+.mod-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  transition:opacity 0.3s;
+}
+.mc1::before{background:linear-gradient(90deg,var(--sap-xl),transparent);}
+.mc2::before{background:linear-gradient(90deg,var(--rub-xl),transparent);}
+.mc3::before{background:linear-gradient(90deg,var(--em-xl),transparent);}
+.mc4::before{background:linear-gradient(90deg,var(--top-xl),transparent);}
+.mod-card::after{
+  content:'';position:absolute;inset:0;opacity:0;
+  transition:opacity 0.4s;
+}
+.mc1::after{background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(30,79,168,0.07),transparent);}
+.mc2::after{background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(139,26,42,0.07),transparent);}
+.mc3::after{background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(14,90,56,0.07),transparent);}
+.mc4::after{background:radial-gradient(ellipse 60% 60% at 30% 30%,rgba(184,120,0,0.07),transparent);}
+.mod-card:hover{background:rgba(255,255,255,0.02);}
+.mod-card:hover::after{opacity:1;}
+.mod-tag{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;color:var(--stone);text-transform:uppercase;margin-bottom:1.5rem;display:block;}
+.mod-icon-wrap{margin-bottom:1.8rem;position:relative;z-index:1;}
+.mod-title{
+  font-family:'Cormorant Garamond',serif;font-size:1.6rem;
+  font-weight:600;color:var(--cream);margin-bottom:0.8rem;position:relative;z-index:1;
+}
+.mod-body{font-size:0.88rem;line-height:1.82;color:rgba(255,255,255,0.4);font-weight:300;margin-bottom:1.5rem;position:relative;z-index:1;}
+.mod-metric{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Space Mono',monospace;font-size:0.68rem;
+  padding:0.4rem 0.9rem;border-radius:3px;position:relative;z-index:1;
+}
+.mm-sap{background:rgba(30,79,168,0.2);color:var(--sap-xl);border:1px solid rgba(122,174,248,0.2);}
+.mm-rub{background:rgba(139,26,42,0.2);color:var(--rub-xl);border:1px solid rgba(240,112,144,0.2);}
+.mm-em{background:rgba(14,90,56,0.2);color:var(--em-xl);border:1px solid rgba(74,190,136,0.2);}
+.mm-top{background:rgba(184,120,0,0.2);color:var(--top-xl);border:1px solid rgba(248,208,96,0.2);}
+.mod-github{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  color:rgba(255,255,255,0.3);text-decoration:none;margin-top:1rem;
+  transition:color 0.2s;position:relative;z-index:1;
+}
+.mod-github:hover{color:var(--sap-xl);}
+
+/* ═══════════════════════════════════════════════════════ PIPELINE */
+#pipeline{background:var(--ink2);overflow:hidden;}
+.pipeline-flow{
+  display:flex;align-items:center;gap:0;margin-top:3rem;
+  position:relative;overflow-x:auto;padding-bottom:2rem;
+}
+.pipe-step{
+  min-width:200px;padding:1.8rem 1.5rem;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  position:relative;transition:all 0.3s;flex-shrink:0;
+}
+.pipe-step:hover{background:rgba(122,174,248,0.05);border-color:rgba(122,174,248,0.2);}
+.pipe-step:not(:last-child)::after{
+  content:'→';position:absolute;right:-18px;top:50%;
+  transform:translateY(-50%);color:rgba(122,174,248,0.4);
+  font-size:1.2rem;z-index:2;
+}
+.pipe-n{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;color:var(--stone);margin-bottom:0.6rem;}
+.pipe-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--cream);margin-bottom:0.4rem;}
+.pipe-sub{font-size:0.78rem;color:rgba(255,255,255,0.35);line-height:1.6;}
+.pipe-time{
+  margin-top:0.8rem;font-family:'Space Mono',monospace;font-size:0.62rem;
+  color:var(--sap-xl);
+}
+.pipeline-total{
+  margin-top:2rem;padding:1.5rem 2rem;
+  background:rgba(30,79,168,0.08);border:1px solid rgba(122,174,248,0.15);
+  display:inline-flex;align-items:center;gap:2rem;
+}
+.pt-label{font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;color:var(--stone);text-transform:uppercase;}
+.pt-val{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--sap-xl);}
+
+/* ═══════════════════════════════════════════════════════ MILESTONES */
+#milestones{background:var(--ink);}
+.ms-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:3rem;overflow-x:auto;}
+.ms-tab{
+  font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;
+  text-transform:uppercase;padding:1rem 1.5rem;color:var(--stone);
+  border-bottom:2px solid transparent;cursor:pointer;
+  transition:all 0.25s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;
+}
+.ms-tab:hover{color:var(--cream);}
+.ms-tab.active{color:var(--sap-xl);border-bottom-color:var(--sap-xl);}
+.ms-content{display:none;}
+.ms-content.active{display:grid;grid-template-columns:280px 1fr;gap:4rem;animation:fadeSlideUp 0.4s ease;}
+.ms-sidebar{}
+.ms-status-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Space Mono',monospace;font-size:0.62rem;
+  padding:0.4rem 1rem;border-radius:3px;margin-bottom:1.5rem;
+}
+.ms-status-done{background:rgba(14,90,56,0.2);color:var(--em-xl);border:1px solid rgba(74,190,136,0.2);}
+.ms-status-now{background:rgba(184,120,0,0.2);color:var(--top-xl);border:1px solid rgba(248,208,96,0.2);}
+.ms-status-up{background:rgba(90,72,56,0.2);color:var(--stone);border:1px solid rgba(176,152,138,0.2);}
+.ms-status-badge .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2s infinite;}
+.ms-marks-big{
+  font-family:'Cormorant Garamond',serif;font-size:4rem;
+  font-weight:300;color:rgba(122,174,248,0.15);line-height:1;
+  margin-bottom:0.3rem;
+}
+.ms-marks-label{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;color:var(--stone);text-transform:uppercase;}
+.ms-deliverables{margin-top:2rem;}
+.ms-del-title{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;color:var(--stone);text-transform:uppercase;margin-bottom:0.8rem;}
+.ms-del-item{
+  display:flex;align-items:flex-start;gap:0.6rem;
+  padding:0.6rem 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  font-size:0.84rem;color:rgba(255,255,255,0.45);
+}
+.ms-del-item::before{content:'·';color:var(--sap-xl);flex-shrink:0;margin-top:0.05rem;}
+.ms-main-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:0.5rem;}
+.ms-main-id{font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;color:var(--stone);margin-bottom:1.5rem;}
+.ms-main-desc{font-size:0.95rem;line-height:1.9;color:rgba(255,255,255,0.45);font-weight:300;margin-bottom:2.5rem;}
+.ms-results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06);margin-top:2rem;}
+.ms-result{background:var(--ink);padding:1.4rem;text-align:center;}
+.ms-result-n{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--sap-xl);display:block;}
+.ms-result-l{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:var(--stone);text-transform:uppercase;margin-top:0.25rem;}
+
+/* ═══════════════════════════════════════════════════════ DOCUMENTS */
+#documents{background:var(--ink2);}
+.docs-masonry{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06);margin-top:4rem;}
+.doc-card{
+  background:var(--ink2);padding:2.2rem;
+  text-decoration:none;color:inherit;
+  position:relative;overflow:hidden;
+  transition:background 0.3s;display:flex;flex-direction:column;gap:0.7rem;
+}
+.doc-card::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:0;
+  background:linear-gradient(to top,rgba(30,79,168,0.06),transparent);
+  transition:height 0.4s;
+}
+.doc-card:hover{background:rgba(255,255,255,0.025);}
+.doc-card:hover::before{height:100%;}
+.doc-type{
+  font-family:'Space Mono',monospace;font-size:0.55rem;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--stone);
+}
+.doc-icon{margin-bottom:0.5rem;}
+.doc-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--cream);}
+.doc-desc{font-size:0.84rem;line-height:1.78;color:rgba(255,255,255,0.35);font-weight:300;flex:1;}
+.doc-link{
+  font-family:'Space Mono',monospace;font-size:0.62rem;
+  color:var(--sap-xl);display:flex;align-items:center;gap:0.4rem;
+  transition:gap 0.2s;
+}
+.doc-card:hover .doc-link{gap:0.7rem;}
+
+/* ═══════════════════════════════════════════════════════ SLIDES */
+#slides{background:var(--ink);}
+.slides-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:4rem;}
+.slide-card{
+  border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.02);overflow:hidden;
+  text-decoration:none;color:inherit;
+  transition:all 0.35s;position:relative;display:block;
+}
+.slide-card:hover{border-color:rgba(122,174,248,0.25);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+.slide-thumb{height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.slide-thumb::after{
+  content:'↗';position:absolute;top:1rem;right:1rem;
+  font-size:1rem;color:rgba(255,255,255,0.25);
+  transition:color 0.3s,transform 0.3s;
+}
+.slide-card:hover .slide-thumb::after{color:var(--sap-xl);transform:translate(2px,-2px);}
+.slide-body{padding:1.2rem;}
+.slide-title{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--cream);margin-bottom:0.3rem;}
+.slide-sub{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;color:var(--stone);}
+
+/* ═══════════════════════════════════════════════════════ ABOUT */
+#about{background:var(--ink2);}
+.supervisor-card{
+  display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:center;
+  padding:2.5rem;border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.02);margin-bottom:4rem;
+  position:relative;overflow:hidden;
+}
+.supervisor-card::before{
+  content:'SUPERVISOR';position:absolute;right:2rem;top:2rem;
+  font-family:'Space Mono',monospace;font-size:0.5rem;letter-spacing:0.25em;
+  color:rgba(255,255,255,0.06);font-weight:700;
+}
+.sup-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sap-xl),var(--em-l));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--ink);font-weight:600;
+  flex-shrink:0;
+}
+.sup-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--cream);margin-bottom:0.3rem;}
+.sup-dept{font-size:0.87rem;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;}
+.sup-email{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--sap-xl);text-decoration:none;}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);}
+.team-card{
+  background:var(--ink2);padding:2.2rem 1.8rem;text-align:center;
+  transition:background 0.3s;position:relative;overflow:hidden;
+}
+.team-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;
+  transition:opacity 0.3s;
+}
+.tc1::after{background:var(--sap-xl);}
+.tc2::after{background:var(--rub-xl);}
+.tc3::after{background:var(--em-xl);}
+.tc4::after{background:var(--top-xl);}
+.team-card:hover{background:rgba(255,255,255,0.025);}
+.team-card:hover::after{opacity:1;}
+.team-av{
+  width:64px;height:64px;border-radius:50%;
+  margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--ink);font-weight:600;
+}
+.av1{background:linear-gradient(135deg,var(--sap-xl),var(--sap-l));}
+.av2{background:linear-gradient(135deg,var(--rub-xl),var(--rub-l));}
+.av3{background:linear-gradient(135deg,var(--em-xl),var(--em-l));}
+.av4{background:linear-gradient(135deg,var(--top-xl),var(--top-l));}
+.team-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--cream);margin-bottom:0.3rem;}
+.team-id{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--stone);margin-bottom:0.5rem;}
+.team-email{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--sap-xl);text-decoration:none;word-break:break-all;line-height:1.5;}
+.team-module{
+  margin-top:1rem;padding:0.3rem 0.7rem;
+  font-family:'Space Mono',monospace;font-size:0.55rem;
+  border-radius:3px;display:inline-block;
+}
+.tm1{background:rgba(30,79,168,0.15);color:var(--sap-xl);}
+.tm2{background:rgba(139,26,42,0.15);color:var(--rub-xl);}
+.tm3{background:rgba(14,90,56,0.15);color:var(--em-xl);}
+.tm4{background:rgba(184,120,0,0.15);color:var(--top-xl);}
+
+/* ═══════════════════════════════════════════════════════ CONTACT */
+#contact{background:var(--ink);padding:7rem 3.5rem;}
+.contact-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:6rem;}
+.contact-form{display:flex;flex-direction:column;gap:1.2rem;}
+.cf-group{display:flex;flex-direction:column;gap:0.5rem;}
+.cf-label{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;color:var(--stone);text-transform:uppercase;}
+.cf-input,.cf-textarea{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:var(--cream);font-family:'Space Grotesk',sans-serif;font-size:0.92rem;
+  padding:0.85rem 1rem;outline:none;border-radius:3px;width:100%;
+  transition:border-color 0.25s,background 0.25s;
+}
+.cf-input:focus,.cf-textarea:focus{border-color:rgba(122,174,248,0.4);background:rgba(30,79,168,0.06);}
+.cf-textarea{min-height:120px;resize:vertical;}
+.cf-btn{
+  background:var(--sap-xl);border:none;color:var(--ink);
+  font-family:'Space Mono',monospace;font-size:0.7rem;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;
+  padding:1rem 2.5rem;cursor:pointer;border-radius:3px;
+  align-self:flex-start;transition:all 0.3s;
+}
+.cf-btn:hover{background:var(--cream);transform:translateY(-2px);box-shadow:0 8px 30px rgba(122,174,248,0.25);}
+.contact-info{}
+.ci-row{
+  display:flex;gap:1.2rem;align-items:flex-start;
+  padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.ci-label{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.12em;color:var(--stone);text-transform:uppercase;min-width:90px;padding-top:0.12rem;}
+.ci-val{font-size:0.87rem;color:rgba(255,255,255,0.55);}
+.ci-val a{color:var(--sap-xl);text-decoration:none;}
+.ci-val a:hover{text-decoration:underline;}
+
+/* ═══════════════════════════════════════════════════════ FOOTER */
+footer{
+  background:var(--ink);border-top:1px solid rgba(255,255,255,0.05);
+  padding:2rem 3.5rem;display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:1rem;
+}
+.fl{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:rgba(255,255,255,0.2);}
+.fr{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;color:rgba(255,255,255,0.12);}
+.footer-links{display:flex;gap:1.5rem;align-items:center;}
+.footer-link{
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  color:rgba(255,255,255,0.25);text-decoration:none;
+  display:flex;align-items:center;gap:0.4rem;
+  transition:color 0.2s;
+}
+.footer-link:hover{color:var(--sap-xl);}
+
+/* ═══════════════════════════════════════════════════════ DIVIDERS */
+.divider{height:1px;background:rgba(255,255,255,0.05);position:relative;z-index:1;}
+.section-number{
+  position:absolute;top:3.5rem;right:3.5rem;
+  font-family:'Cormorant Garamond',serif;font-size:8rem;
+  font-weight:700;color:rgba(255,255,255,0.025);
+  line-height:1;pointer-events:none;z-index:0;
+  font-style:italic;
+}
+
+/* ═══════════════════════════════════════════════════════ SCROLL PROGRESS */
+#scroll-progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--sap-xl),var(--em-xl),var(--top-xl));
+  z-index:1000;transition:width 0.1s;
+}
+
+/* ═══════════════════════════════════════════════════════ FLOATING GEM TOOLTIP */
+.gem-tooltip{
+  position:fixed;z-index:800;pointer-events:none;
+  padding:0.5rem 0.9rem;background:rgba(10,8,6,0.9);
+  border:1px solid rgba(255,255,255,0.1);border-radius:4px;
+  font-family:'Space Mono',monospace;font-size:0.6rem;
+  color:var(--cream);letter-spacing:0.08em;
+  opacity:0;transition:opacity 0.2s;white-space:nowrap;
+  backdrop-filter:blur(10px);
+}
+
+/* ═══════════════════════════════════════════════════════ ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:0.6;transform:scale(0.9);}50%{opacity:1;transform:scale(1.1);}}
+@keyframes gem-float{0%,100%{transform:translate(-50%,-50%) translateY(0) rotate(0deg);}33%{transform:translate(-50%,-50%) translateY(-18px) rotate(2deg);}66%{transform:translate(-50%,-50%) translateY(-8px) rotate(-1deg);}}
+@keyframes gem-rotate{from{transform:translate(-50%,-50%) rotateY(0deg);}to{transform:translate(-50%,-50%) rotateY(360deg);}}
+@keyframes orbit-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes shimmer{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+@keyframes glow-pulse{0%,100%{filter:drop-shadow(0 0 8px currentColor);}50%{filter:drop-shadow(0 0 20px currentColor);}}
+@keyframes scan-line{0%{transform:translateY(-100%);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(100vh);opacity:0;}}
+
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.75s cubic-bezier(0.25,0.46,0.45,0.94),transform 0.75s cubic-bezier(0.25,0.46,0.45,0.94);}
+.reveal.show{opacity:1;transform:none;}
+.reveal-delay-1{transition-delay:0.1s;}
+.reveal-delay-2{transition-delay:0.2s;}
+.reveal-delay-3{transition-delay:0.3s;}
+
+/* ═══════════════════════════════════════════════════════ SCAN EFFECT */
+.scan-line{
+  position:fixed;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(122,174,248,0.15),transparent);
+  pointer-events:none;z-index:9;animation:scan-line 8s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════ RESPONSIVE */
+@media(max-width:1024px){
+  nav{padding:1rem 1.5rem;}
+  .nav-links{display:none;}
+  #home{padding:5rem 1.5rem 3rem;flex-direction:column;}
+  .hero-visual-wrap{position:relative;top:auto;transform:none;right:auto;width:100%;height:300px;margin-top:2rem;}
+  .section,.contact-inner{padding-left:1.5rem;padding-right:1.5rem;}
+  .domain-split,.ms-content.active,.contact-inner{grid-template-columns:1fr;}
+  .mod-showcase,.docs-masonry,.team-grid{grid-template-columns:1fr 1fr;}
+  .slides-row{grid-template-columns:1fr 1fr;}
+  .ms-results-grid{grid-template-columns:1fr 1fr;}
+  #contact{padding:5rem 1.5rem;}
+}
+@media(max-width:600px){
+  .mod-showcase,.docs-masonry,.team-grid,.slides-row{grid-template-columns:1fr;}
+  .hero-stats-row{gap:1.5rem;}
 }
 </style>
 </head>
 <body>
 
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- SCROLL PROGRESS -->
+<div id="scroll-progress"></div>
+
+<!-- SCAN LINE -->
+<div class="scan-line"></div>
+
+<!-- GEM TOOLTIP -->
+<div class="gem-tooltip" id="gemTooltip"></div>
+
+<!-- FALLING GEMS CANVAS -->
+<canvas id="gemCanvas"></canvas>
+
 <!-- NAV -->
 <nav>
-  <a class="nav-brand" href="#home">
-    <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
-      <polygon points="20,3 37,13 37,31 20,40 3,31 3,13" fill="none" stroke="#1e4a8a" stroke-width="1.5"/>
-      <polygon points="20,3 37,13 20,20" fill="#d4e8fb"/>
-      <polygon points="20,3 3,13 20,20" fill="#b8d4f5"/>
-      <polygon points="37,13 37,31 20,20" fill="#8ab8e8"/>
-      <polygon points="3,13 3,31 20,20" fill="#a8ccf0"/>
-      <polygon points="37,31 20,40 20,20" fill="#6a9fd4"/>
-      <polygon points="3,31 20,40 20,20" fill="#7aaeda"/>
+  <a class="nav-gem" href="#home">
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <polygon points="20,2 38,12 38,30 20,40 2,30 2,12" fill="none" stroke="rgba(122,174,248,0.5)" stroke-width="1"/>
+      <polygon points="20,2 38,12 20,18" fill="rgba(122,174,248,0.4)"/>
+      <polygon points="20,2 2,12 20,18" fill="rgba(122,174,248,0.3)"/>
+      <polygon points="38,12 38,30 20,18" fill="rgba(122,174,248,0.2)"/>
+      <polygon points="2,12 2,30 20,18" fill="rgba(122,174,248,0.25)"/>
+      <polygon points="38,30 20,40 20,18" fill="rgba(122,174,248,0.15)"/>
+      <polygon points="2,30 20,40 20,18" fill="rgba(122,174,248,0.18)"/>
     </svg>
-    GemCut Robotics
+    GemCut<span>Robotics</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#home">Home</a></li>
+    <li><a href="#home" class="active">Home</a></li>
     <li><a href="#domain">Domain</a></li>
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
     <li><a href="#milestones">Milestones</a></li>
-    <li><a href="#documents">Documents</a></li>
+    <li><a href="#documents">Docs</a></li>
     <li><a href="#slides">Slides</a></li>
-    <li><a href="#about">About Us</a></li>
-    <li><a href="#contact">Contact Us</a></li>
+    <li><a href="#about">Team</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
 
-<!-- HOME -->
+<!-- ═══════════════════ HERO ═══════════════════ -->
 <section id="home">
-  <div class="hero-dots"></div>
-  <div>
-    <div class="eyebrow">SLIIT · BSc (Hons) IT · RP-25J-231</div>
-    <h1 class="hero-title">Intelligent Gem Cutting<br><em>Robotic Arm</em></h1>
-    <p class="hero-desc">A semi-autonomous system combining machine learning, computer vision, and robotics to automate gemstone identification, evaluation, and precision cutting — built for Sri Lanka's gem industry.</p>
-    <div class="hero-tags">
-      <span class="tag b">ROS 2 Jazzy</span><span class="tag b">Machine Learning</span>
-      <span class="tag r">Gem Identification</span><span class="tag r">Defect Detection</span>
-      <span class="tag g">6-DOF Robotic Arm</span><span class="tag g">Cut Recommendation</span>
-      <span class="tag">MoveIt 2</span><span class="tag">EfficientNetB3</span>
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">SLIIT · RP-25J-231 · BSc (Hons) IT</div>
+    <h1 class="hero-title">
+      Intelligent<br>
+      <span class="line2">Gem Cutting</span><br>
+      <span class="line3">Robotic Arm</span>
+    </h1>
+    <p class="hero-desc">
+      A semi-autonomous system fusing machine learning, computer vision, and precision robotics to automate gemstone identification, defect evaluation, and cutting — engineered for Sri Lanka's gem industry.
+    </p>
+    <div class="hero-stats-row">
+      <div class="hstat"><span class="hstat-n">92%</span><span class="hstat-l">Identification Acc.</span></div>
+      <div class="hstat"><span class="hstat-n">0.88</span><span class="hstat-l">Defect F1-Score</span></div>
+      <div class="hstat"><span class="hstat-n">84%</span><span class="hstat-l">Cut Family Acc.</span></div>
+      <div class="hstat"><span class="hstat-n">3.2s</span><span class="hstat-l">Pipeline / Gem</span></div>
     </div>
-    <div class="hero-stats">
-      <div class="hstat"><span class="hstat-n">92%</span><span class="hstat-l">Identification accuracy</span></div>
-      <div class="hstat"><span class="hstat-n">0.88</span><span class="hstat-l">Defect F1-score</span></div>
-      <div class="hstat"><span class="hstat-n">91.4%</span><span class="hstat-l">Pipeline success rate</span></div>
+    <div class="hero-cta">
+      <a class="btn-primary" href="#domain">Explore Research ↓</a>
+      <a class="btn-ghost" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+        GitHub
+      </a>
     </div>
   </div>
 
-  <div class="hero-visual floating">
-    <svg viewBox="0 0 480 520" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="240" cy="270" r="210" fill="#f0ece4" opacity="0.7"/>
-      <circle cx="240" cy="270" r="165" fill="#e8e2d8" opacity="0.45"/>
-      <rect x="185" y="368" width="110" height="16" rx="5" fill="#3a3028"/>
-      <rect x="200" y="354" width="80" height="18" rx="4" fill="#4a4038"/>
-      <ellipse cx="240" cy="352" rx="32" ry="12" fill="#5a5048"/>
-      <g class="arm-j1">
-        <rect x="226" y="268" width="28" height="88" rx="7" fill="#5a7faa"/>
-        <ellipse cx="240" cy="268" rx="16" ry="7" fill="#6a8fba"/>
-        <ellipse cx="240" cy="268" rx="8" ry="4" fill="#4a6f9a"/>
-        <ellipse cx="240" cy="352" rx="16" ry="7" fill="#6a8fba"/>
-      </g>
-      <g class="arm-j2">
-        <rect x="228" y="195" width="24" height="78" rx="6" fill="#3a72c4"/>
-        <ellipse cx="240" cy="195" rx="14" ry="6" fill="#4a82d4"/>
-        <ellipse cx="240" cy="195" rx="7" ry="3.5" fill="#2a62b4"/>
-        <ellipse cx="240" cy="268" rx="14" ry="6" fill="#4a82d4"/>
-      </g>
-      <g class="arm-j3">
-        <rect x="230" y="138" width="20" height="62" rx="5" fill="#2868b8"/>
-        <ellipse cx="240" cy="138" rx="12" ry="5" fill="#3878c8"/>
-        <ellipse cx="240" cy="138" rx="6" ry="3" fill="#1858a8"/>
-        <ellipse cx="240" cy="195" rx="12" ry="5" fill="#3878c8"/>
-        <rect x="228" y="110" width="24" height="32" rx="5" fill="#2060b0"/>
-        <rect x="234" y="85" width="12" height="28" rx="3" fill="#999"/>
-        <rect x="237" y="62" width="6" height="26" rx="2" fill="#bbb"/>
-        <polygon points="237,62 243,62 240,50" fill="#ccc"/>
-        <ellipse cx="240" cy="50" rx="4" ry="3" fill="white" opacity="0.5"/>
-      </g>
-      <g transform="translate(290,105)" class="gem-glow">
-        <polygon points="50,4 82,20 82,48 50,64 18,48 18,20" fill="#1a4a9a" opacity="0.95"/>
-        <polygon points="50,4 82,20 50,26" fill="#5090e8"/>
-        <polygon points="50,4 18,20 50,26" fill="#4080d8"/>
-        <polygon points="82,20 82,48 50,26" fill="#2060c0"/>
-        <polygon points="18,20 18,48 50,26" fill="#3070c8"/>
-        <polygon points="82,48 82,54 50,68" fill="#0a3080"/>
-        <polygon points="18,48 18,54 50,68" fill="#1040a0"/>
-        <polygon points="82,54 50,68 50,88" fill="#081a60"/>
-        <polygon points="18,54 50,68 50,88" fill="#0e2870"/>
-        <polygon points="50,4 82,20 50,26 18,20" fill="white" opacity="0.08"/>
-        <circle class="sp" cx="62" cy="11" r="2.5" fill="white" opacity="0.9" style="animation-delay:0s"/>
-        <circle class="sp" cx="38" cy="24" r="1.8" fill="white" opacity="0.75" style="animation-delay:0.5s"/>
-        <circle class="sp" cx="70" cy="34" r="1.4" fill="white" opacity="0.85" style="animation-delay:1s"/>
-        <circle class="sp" cx="32" cy="40" r="2" fill="white" opacity="0.7" style="animation-delay:1.4s"/>
-        <text x="50" y="102" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8" fill="#7a6a58" letter-spacing="1.5">SAPPHIRE</text>
-      </g>
-      <line class="scan" x1="240" y1="50" x2="320" y2="130" stroke="#3a80d8" stroke-width="1" stroke-dasharray="5 3"/>
-      <line class="scan" x1="240" y1="56" x2="315" y2="140" stroke="#3a80d8" stroke-width="0.6" stroke-dasharray="3 5" style="animation-delay:0.5s"/>
-      <!-- Ruby -->
-      <g transform="translate(55,72)">
-        <polygon points="28,2 50,15 50,41 28,54 6,41 6,15" fill="#7a1a2a" opacity="0.9"/>
-        <polygon points="28,2 50,15 28,22" fill="#d04060"/>
-        <polygon points="28,2 6,15 28,22" fill="#c03050"/>
-        <polygon points="50,15 50,41 28,22" fill="#901828"/>
-        <polygon points="6,15 6,41 28,22" fill="#a02030"/>
-        <polygon points="50,41 50,46 28,58" fill="#501018"/>
-        <polygon points="6,41 6,46 28,58" fill="#681820"/>
-        <circle class="sp" cx="36" cy="8" r="1.8" fill="white" opacity="0.8" style="animation-delay:0.8s"/>
-        <text x="28" y="70" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">RUBY</text>
-      </g>
-      <!-- Emerald -->
-      <g transform="translate(350,290)">
-        <rect x="4" y="8" width="50" height="42" rx="4" fill="#0e5030" opacity="0.9"/>
-        <rect x="4" y="8" width="50" height="12" rx="4" fill="#20804060"/>
-        <rect x="4" y="38" width="50" height="12" rx="4" fill="#0a381860"/>
-        <line x1="4" y1="20" x2="54" y2="20" stroke="#20a050" stroke-width="0.8" opacity="0.5"/>
-        <line x1="4" y1="38" x2="54" y2="38" stroke="#20a050" stroke-width="0.8" opacity="0.5"/>
-        <circle class="sp" cx="42" cy="14" r="1.5" fill="white" opacity="0.75" style="animation-delay:1.2s"/>
-        <text x="29" y="65" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">EMERALD</text>
-      </g>
-      <!-- Topaz -->
-      <g transform="translate(60,320)">
-        <polygon points="28,4 52,18 52,44 28,58 4,44 4,18" fill="#a06008" opacity="0.85"/>
-        <polygon points="28,4 52,18 28,24" fill="#f0b040"/>
-        <polygon points="28,4 4,18 28,24" fill="#e0a030"/>
-        <polygon points="52,18 52,44 28,24" fill="#c07010"/>
-        <polygon points="4,18 4,44 28,24" fill="#d08020"/>
-        <circle class="sp" cx="38" cy="10" r="1.5" fill="white" opacity="0.85" style="animation-delay:0.3s"/>
-        <text x="28" y="70" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="#7a6a58" letter-spacing="1">TOPAZ</text>
-      </g>
-    </svg>
+  <!-- Hero 3D Gem Visual -->
+  <div class="hero-visual-wrap">
+    <div class="gem-orbit">
+      <div class="orbit-dot"></div>
+    </div>
+    <div class="gem-orbit mid">
+      <div class="orbit-dot" style="background:var(--em-xl);box-shadow:0 0 10px var(--em-xl);top:0;left:50%;"></div>
+    </div>
+    <div class="gem-orbit inner">
+      <div class="orbit-dot" style="background:var(--rub-xl);box-shadow:0 0 10px var(--rub-xl);top:50%;left:100%;"></div>
+    </div>
+    <div class="center-gem">
+      <svg width="260" height="300" viewBox="0 0 260 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main sapphire faceted gem -->
+        <polygon points="130,10 230,65 230,185 130,240 30,185 30,65" fill="rgba(30,79,168,0.15)" stroke="rgba(122,174,248,0.5)" stroke-width="0.8"/>
+        <!-- Top facets -->
+        <polygon points="130,10 230,65 130,100" fill="rgba(122,174,248,0.45)"/>
+        <polygon points="130,10 30,65 130,100" fill="rgba(74,128,224,0.45)"/>
+        <!-- Side facets -->
+        <polygon points="230,65 230,185 130,100" fill="rgba(30,79,168,0.5)"/>
+        <polygon points="30,65 30,185 130,100" fill="rgba(74,128,224,0.4)"/>
+        <!-- Bottom facets -->
+        <polygon points="230,185 130,240 130,100" fill="rgba(20,60,140,0.6)"/>
+        <polygon points="30,185 130,240 130,100" fill="rgba(40,90,180,0.5)"/>
+        <!-- Inner detail lines -->
+        <line x1="130" y1="10" x2="130" y2="100" stroke="rgba(122,174,248,0.2)" stroke-width="0.5"/>
+        <line x1="230" y1="65" x2="130" y2="100" stroke="rgba(122,174,248,0.15)" stroke-width="0.5"/>
+        <line x1="30" y1="65" x2="130" y2="100" stroke="rgba(122,174,248,0.15)" stroke-width="0.5"/>
+        <line x1="130" y1="240" x2="130" y2="100" stroke="rgba(122,174,248,0.1)" stroke-width="0.5"/>
+        <!-- Sparkle points -->
+        <circle cx="170" cy="40" r="3" fill="white" opacity="0.9">
+          <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.1s" repeatCount="indefinite"/>
+          <animate attributeName="r" values="3;1.5;3" dur="2.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="90" cy="55" r="2" fill="white" opacity="0.7">
+          <animate attributeName="opacity" values="0.7;0.15;0.7" dur="1.7s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="200" cy="120" r="2.5" fill="white" opacity="0.8">
+          <animate attributeName="opacity" values="0.8;0.1;0.8" dur="2.8s" repeatCount="indefinite"/>
+          <animate attributeName="r" values="2.5;1;2.5" dur="2.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="58" cy="140" r="1.8" fill="white" opacity="0.6">
+          <animate attributeName="opacity" values="0.6;0.1;0.6" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="148" cy="80" r="4" fill="white" opacity="0.5">
+          <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Light reflection streak -->
+        <line x1="130" y1="10" x2="200" y2="70" stroke="white" stroke-width="0.5" opacity="0.3">
+          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite"/>
+        </line>
+        <!-- Label -->
+        <text x="130" y="270" text-anchor="middle" font-family="'Space Mono',monospace" font-size="9" fill="rgba(122,174,248,0.4)" letter-spacing="4">BLUE SAPPHIRE</text>
+        <text x="130" y="285" text-anchor="middle" font-family="'Space Mono',monospace" font-size="7" fill="rgba(255,255,255,0.15)" letter-spacing="2">RI 1.762–1.788 · SG 4.0</text>
+      </svg>
+    </div>
+    <!-- Floating labels around gem -->
+    <div style="position:absolute;top:18%;left:5%;font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(240,112,144,0.6);">
+      <div style="margin-bottom:0.2rem;color:var(--rub-xl);font-size:0.65rem;">▲</div>
+      RUBY
+    </div>
+    <div style="position:absolute;top:72%;right:6%;font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(74,190,136,0.6);">
+      <div style="margin-bottom:0.2rem;color:var(--em-xl);font-size:0.65rem;">⬡</div>
+      EMERALD
+    </div>
+    <div style="position:absolute;bottom:10%;left:8%;font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(248,208,96,0.6);">
+      <div style="margin-bottom:0.2rem;color:var(--top-xl);font-size:0.65rem;">◆</div>
+      TOPAZ
+    </div>
+    <div style="position:absolute;top:40%;right:3%;font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.1em;color:rgba(200,128,240,0.6);">
+      <div style="margin-bottom:0.2rem;color:var(--am-xl);font-size:0.65rem;">●</div>
+      SPINEL
+    </div>
   </div>
 </section>
 
-<div class="divhr"></div>
+<div class="divider"></div>
 
-<!-- DOMAIN -->
-<section id="domain" style="background:var(--white);">
-  <div class="sec reveal">
-    <div class="eyebrow">02 · Domain</div>
-    <h2 class="sec-title">Research <em>Domain</em></h2>
-    <p class="sec-lead">Exploring the intersection of computer vision, machine learning, and robotics to automate the centuries-old craft of gemstone cutting for Sri Lanka's gem industry.</p>
-    <div class="domain-grid">
+<!-- ═══════════════════ DOMAIN ═══════════════════ -->
+<section id="domain" class="section" style="background:var(--ink2);position:relative;overflow:hidden;">
+  <div class="section-number">02</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">02 · Research Domain</div>
+    <h2 class="sec-title reveal reveal-delay-1">The <em>Problem</em> We're Solving</h2>
+    <p class="sec-lead reveal reveal-delay-2">Sri Lanka processes over 90% of the world's blue sapphires, yet every cut is made by hand. We're changing that — with intelligent, precision-guided robotics.</p>
+
+    <div class="domain-split reveal">
       <div>
-        <div class="domain-cards">
-          <div class="dcard">
-            <div class="dcard-lbl">Literature Survey</div>
-            <div class="dcard-title">Prior Work & Context</div>
-            <p class="dcard-body">Reviewed 60+ papers on gem classification (CNN/SVM approaches), robotic manipulation (ROS-based systems), defect detection in materials science, and GIA cutting standards. Sri Lanka's gem industry processes over 90% of the world's blue sapphires, yet cutting remains entirely manual.</p>
+        <div class="research-cards">
+          <div class="rcard">
+  <span class="rcard-tag">Literature Survey</span>
+
+  <div class="rcard-title">What Came Before</div>
+
+  <p class="rcard-body">
+    Reviewed 60+ papers spanning CNN/SVM gem classification, ROS-based robotic manipulation,
+    defect detection from materials science, and GIA cutting standards.
+    Prior systems address isolated components — none unify them for Sri Lankan gems.
+  </p>
+
+  <!-- References -->
+  <div class="rcard-ref">
+    <strong>References:</strong>
+    <ol>
+      <li>LeCun et al., 2015 – Deep Learning for Image Recognition</li>
+      <li>Quigley et al., 2009 – ROS: Robot Operating System</li>
+      <li>GIA Gemstone Cutting Standards, 2020</li>
+      <li>Support Vector Machines in Material Classification – IEEE Papers</li>
+    </ol>
+  </div>
+
+</div>
+          <div class="rcard">
+            <span class="rcard-tag">Research Gap</span>
+            <div class="rcard-title">The Missing Link</div>
+            <p class="rcard-body">No existing system integrates identification, defect evaluation, cut recommendation, and robotic execution in one unified pipeline — especially for species native to Sri Lanka: Blue Sapphire, Spinel, Moonstone, Alexandrite.</p>
           </div>
-          <div class="dcard">
-            <div class="dcard-lbl">Research Gap</div>
-            <div class="dcard-title">What's Missing</div>
-            <p class="dcard-body">No existing system integrates gemstone identification, defect evaluation, cut recommendation, and robotic execution in one unified pipeline — especially for Sri Lankan gem types such as Blue Sapphire, Spinel, and Moonstone.</p>
+          <div class="rcard">
+            <span class="rcard-tag">Research Problem</span>
+            <div class="rcard-title">Manual Cutting is Unsustainable</div>
+            <p class="rcard-body">Expert-dependent, inconsistent, non-scalable. A master cutter evaluates by eye alone — leading to material waste of 30–70% per stone. Our system targets sub-millimetre precision and data-driven cut planning.</p>
           </div>
-          <div class="dcard">
-            <div class="dcard-lbl">Research Problem</div>
-            <div class="dcard-title">Core Challenge</div>
-            <p class="dcard-body">Traditional gem cutting is expert-dependent, inconsistent, and non-scalable. Sri Lanka's gem industry needs intelligent automation that maintains quality while reducing material waste and cutting time.</p>
-          </div>
-          <div class="dcard">
-            <div class="dcard-lbl">Methodology</div>
-            <div class="dcard-title">Our Approach</div>
-            <p class="dcard-body">Multimodal fusion (EfficientNetB3 + physical constants), ensemble defect classifiers, two-stage CatBoost/XGBoost cut planning, and ROS 2 robotic execution via D–H kinematic modelling through a complete integrated pipeline.</p>
+          <div class="rcard">
+            <span class="rcard-tag">Methodology</span>
+            <div class="rcard-title">Our Approach</div>
+            <p class="rcard-body">Multimodal fusion (EfficientNetB3 + physical constants), soft-voting ensemble defect classifiers with 168-dimensional features, two-stage CatBoost/XGBoost cut planning aligned to GIA standards, and ROS 2 execution via D–H kinematics.</p>
           </div>
         </div>
-        <div class="tech-wrap">
-          <div class="tech-hd">Technologies Used</div>
-          <div class="tech-tags">
-            <span class="tech-tag">ROS 2 Jazzy</span><span class="tech-tag">Gazebo Harmonic</span>
-            <span class="tech-tag">MoveIt 2</span><span class="tech-tag">EfficientNetB3</span>
-            <span class="tech-tag">TensorFlow / Keras</span><span class="tech-tag">CatBoost</span>
-            <span class="tech-tag">XGBoost</span><span class="tech-tag">Scikit-learn</span>
-            <span class="tech-tag">OpenCV</span><span class="tech-tag">Python 3.10</span>
-            <span class="tech-tag">ESP32-S3</span><span class="tech-tag">Raspberry Pi 5</span>
-            <span class="tech-tag">PCA9685</span><span class="tech-tag">MG996R Servos</span>
-            <span class="tech-tag">HX711 Load Cell</span><span class="tech-tag">KDL Kinematics</span>
-            <span class="tech-tag">Ubuntu 24.04</span><span class="tech-tag">PyTorch</span>
+
+        <div class="tech-cloud">
+          <div class="tech-cloud-title">Technologies &amp; Libraries</div>
+          <div class="tech-tags-wrap">
+            <span class="tech-pill">ROS 2 Jazzy</span><span class="tech-pill">Gazebo Harmonic</span>
+            <span class="tech-pill">MoveIt 2</span><span class="tech-pill">EfficientNetB3</span>
+            <span class="tech-pill">TensorFlow / Keras</span><span class="tech-pill">CatBoost</span>
+            <span class="tech-pill">XGBoost</span><span class="tech-pill">Scikit-learn</span>
+            <span class="tech-pill">OpenCV</span><span class="tech-pill">Python 3.10</span>
+            <span class="tech-pill">ESP32-S3</span><span class="tech-pill">Raspberry Pi 5</span>
+            <span class="tech-pill">PCA9685</span><span class="tech-pill">MG996R Servos</span>
+            <span class="tech-pill">HX711 Load Cell</span><span class="tech-pill">KDL Kinematics</span>
+            <span class="tech-pill">Ubuntu 24.04</span><span class="tech-pill">PyTorch</span>
+            <span class="tech-pill">D–H Parameters</span><span class="tech-pill">URDF / SDF</span>
           </div>
         </div>
       </div>
+
       <div>
-        <div class="eyebrow" style="margin-top:0.3rem;">Research Objectives</div>
-        <h3 class="sec-title" style="font-size:1.75rem; margin-bottom:1.5rem;">Four Key <em>Goals</em></h3>
-        <ul class="obj-list">
-          <li class="obj-item"><span class="obj-n">I</span><span class="obj-t">Develop a multimodal gemstone identification system fusing EfficientNetB3 visual features with physical constants (RI, SG, Hardness) across 34 Sri Lankan gem types.</span></li>
-          <li class="obj-item"><span class="obj-n">II</span><span class="obj-t">Build a defect-aware evaluation module using a Soft Voting Ensemble Classifier with 168-dimensional handcrafted features across 8 defect categories.</span></li>
-          <li class="obj-item"><span class="obj-n">III</span><span class="obj-t">Design a two-stage CatBoost/XGBoost cut-type recommendation pipeline predicting crown, pavilion, table, and depth parameters aligned with GIA standards.</span></li>
-          <li class="obj-item"><span class="obj-n">IV</span><span class="obj-t">Implement a ROS 2-based robotic execution framework with Gazebo simulation, MoveIt 2 planning, and Sim-to-Real translation via ESP32-S3 and PCA9685.</span></li>
-        </ul>
-        <div style="margin-top:2rem; padding:1.8rem 1.6rem; background:var(--off); border:1px solid var(--mid);">
-          <div class="tech-hd" style="margin-bottom:1.2rem;">Gemstone Cut Anatomy</div>
-          <svg viewBox="0 0 300 195" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
-            <polygon points="90,42 210,42 240,82 150,172 60,82" fill="#e8f2fb" stroke="#1e4a8a" stroke-width="1.2"/>
-            <line x1="90" y1="42" x2="210" y2="42" stroke="#1e4a8a" stroke-width="2.5"/>
-            <polygon points="90,42 210,42 240,82 150,82 60,82" fill="#c8e0f8" stroke="#1e4a8a" stroke-width="0.8" opacity="0.7"/>
-            <line x1="150" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
-            <line x1="90" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
-            <line x1="210" y1="42" x2="150" y2="82" stroke="#1e4a8a" stroke-width="0.5" opacity="0.4"/>
-            <line x1="60" y1="82" x2="240" y2="82" stroke="#888" stroke-width="1.5" stroke-dasharray="5 3"/>
-            <polygon points="60,82 240,82 150,172" fill="#b8d4f5" stroke="#1e4a8a" stroke-width="0.8" opacity="0.8"/>
-            <line x1="60" y1="82" x2="150" y2="172" stroke="#1e4a8a" stroke-width="0.5" opacity="0.3"/>
-            <line x1="240" y1="82" x2="150" y2="172" stroke="#1e4a8a" stroke-width="0.5" opacity="0.3"/>
-            <line x1="150" y1="42" x2="150" y2="22" stroke="#b8a898" stroke-width="0.8"/>
-            <text x="152" y="20" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Table</text>
-            <line x1="65" y1="60" x2="30" y2="55" stroke="#b8a898" stroke-width="0.8"/>
-            <text x="4" y="58" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Crown</text>
-            <line x1="240" y1="82" x2="262" y2="82" stroke="#b8a898" stroke-width="0.8"/>
-            <text x="264" y="86" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Girdle</text>
-            <line x1="65" y1="120" x2="30" y2="125" stroke="#b8a898" stroke-width="0.8"/>
-            <text x="2" y="129" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Pavilion</text>
-            <line x1="150" y1="172" x2="150" y2="185" stroke="#b8a898" stroke-width="0.8"/>
-            <text x="128" y="193" font-family="'DM Mono',monospace" font-size="9" fill="#7a6a58">Culet</text>
-            <path d="M82,82 A18,18 0 0 1 96,67" stroke="#c8860a" stroke-width="1.2" fill="none"/>
-            <text x="48" y="76" font-family="'DM Mono',monospace" font-size="8" fill="#c8860a">crown∠</text>
-            <line x1="252" y1="42" x2="252" y2="172" stroke="#9b2335" stroke-width="0.8"/>
-            <polygon points="248,47 256,47 252,42" fill="#9b2335"/>
-            <polygon points="248,167 256,167 252,172" fill="#9b2335"/>
-            <text x="254" y="112" font-family="'DM Mono',monospace" font-size="8" fill="#9b2335">depth</text>
+        <div class="eyebrow" style="margin-top:0.2rem;">Four Research Objectives</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);margin-bottom:2rem;">Key <em>Goals</em></h3>
+        <div class="obj-stack">
+          <div class="obj">
+            <div class="obj-n">I</div>
+            <div class="obj-t"><strong>Multimodal Gem Identification</strong><br>Fuse EfficientNetB3 visual embeddings with physical constants (RI, SG, Mohs hardness) across 34 Sri Lankan gem types — natural, treated, synthetic, and imitation.</div>
+          </div>
+          <div class="obj">
+            <div class="obj-n">II</div>
+            <div class="obj-t"><strong>Defect-Aware Evaluation</strong><br>Soft Voting Ensemble with 168-dimensional handcrafted features for 8-class defect detection. HX711 load cell integration for weight and value estimation.</div>
+          </div>
+          <div class="obj">
+            <div class="obj-n">III</div>
+            <div class="obj-t"><strong>Cut Recommendation Pipeline</strong><br>Two-stage CatBoost/XGBoost pipeline predicting cut family, precise cut type, crown/pavilion angles, table % and depth % aligned with GIA standards.</div>
+          </div>
+          <div class="obj">
+            <div class="obj-n">IV</div>
+            <div class="obj-t"><strong>ROS 2 Robotic Execution</strong><br>Gazebo Harmonic simulation, MoveIt 2 trajectory planning, and Sim-to-Real translation via ESP32-S3 and PCA9685 servo driver on a 5-DOF physical prototype.</div>
+          </div>
+        </div>
+
+        <!-- Gem anatomy SVG -->
+        <div style="margin-top:2.5rem;padding:2rem;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);">
+          <div class="tech-cloud-title" style="margin-bottom:1.5rem;">Cut Anatomy Reference</div>
+          <svg viewBox="0 0 320 210" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+            <polygon points="95,45 225,45 255,88 160,182 65,88" fill="rgba(30,79,168,0.1)" stroke="rgba(122,174,248,0.3)" stroke-width="0.8"/>
+            <line x1="95" y1="45" x2="225" y2="45" stroke="rgba(122,174,248,0.8)" stroke-width="2.5"/>
+            <polygon points="95,45 225,45 255,88 160,88 65,88" fill="rgba(122,174,248,0.12)" stroke="rgba(122,174,248,0.2)" stroke-width="0.6" opacity="0.8"/>
+            <line x1="160" y1="45" x2="160" y2="88" stroke="rgba(122,174,248,0.15)" stroke-width="0.5"/>
+            <line x1="95" y1="45" x2="160" y2="88" stroke="rgba(122,174,248,0.12)" stroke-width="0.5"/>
+            <line x1="225" y1="45" x2="160" y2="88" stroke="rgba(122,174,248,0.12)" stroke-width="0.5"/>
+            <line x1="65" y1="88" x2="255" y2="88" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="5 3"/>
+            <polygon points="65,88 255,88 160,182" fill="rgba(30,79,168,0.18)" stroke="rgba(122,174,248,0.2)" stroke-width="0.6" opacity="0.9"/>
+            <line x1="65" y1="88" x2="160" y2="182" stroke="rgba(122,174,248,0.08)" stroke-width="0.5"/>
+            <line x1="255" y1="88" x2="160" y2="182" stroke="rgba(122,174,248,0.08)" stroke-width="0.5"/>
+            <!-- Labels -->
+            <line x1="160" y1="45" x2="160" y2="25" stroke="rgba(122,174,248,0.3)" stroke-width="0.7"/>
+            <text x="162" y="23" font-family="'Space Mono',monospace" font-size="8.5" fill="rgba(122,174,248,0.7)">Table</text>
+            <line x1="70" y1="64" x2="32" y2="58" stroke="rgba(255,255,255,0.15)" stroke-width="0.7"/>
+            <text x="2" y="62" font-family="'Space Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.35)">Crown</text>
+            <line x1="255" y1="88" x2="278" y2="88" stroke="rgba(255,255,255,0.15)" stroke-width="0.7"/>
+            <text x="280" y="92" font-family="'Space Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.35)">Girdle</text>
+            <line x1="70" y1="128" x2="32" y2="132" stroke="rgba(255,255,255,0.15)" stroke-width="0.7"/>
+            <text x="0" y="136" font-family="'Space Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.35)">Pavilion</text>
+            <line x1="160" y1="182" x2="160" y2="198" stroke="rgba(255,255,255,0.15)" stroke-width="0.7"/>
+            <text x="134" y="207" font-family="'Space Mono',monospace" font-size="8.5" fill="rgba(255,255,255,0.35)">Culet</text>
+            <!-- Crown angle arc -->
+            <path d="M88,88 A22,22 0 0 1 104,70" stroke="rgba(248,208,96,0.6)" stroke-width="1" fill="none"/>
+            <text x="54" y="78" font-family="'Space Mono',monospace" font-size="7.5" fill="rgba(248,208,96,0.7)">crown∠</text>
+            <!-- Depth arrow -->
+            <line x1="268" y1="45" x2="268" y2="182" stroke="rgba(240,112,144,0.4)" stroke-width="0.8"/>
+            <polygon points="264,50 272,50 268,45" fill="rgba(240,112,144,0.4)"/>
+            <polygon points="264,177 272,177 268,182" fill="rgba(240,112,144,0.4)"/>
+            <text x="272" y="120" font-family="'Space Mono',monospace" font-size="7.5" fill="rgba(240,112,144,0.6)">depth</text>
           </svg>
         </div>
       </div>
@@ -491,437 +968,1002 @@ footer { background:var(--darker); border-top:1px solid rgba(255,255,255,0.07); 
   </div>
 </section>
 
-<!-- SYSTEM MODULES (part of Domain) -->
-<div class="modules-sub">
-  <div class="sec reveal">
-    <div class="eyebrow">02b · System Modules</div>
-    <h2 class="sec-title" style="color:var(--white);">Four Integrated <em>Components</em></h2>
-    <p class="sec-lead">Each module feeds into the next — from gem identification to robotic execution — completing a full pipeline in ~3.2 seconds per gemstone.</p>
-    <div class="mod-grid">
-      <div class="mod m1">
-        <div class="mod-n">MODULE 01</div>
-        <div class="mod-icon">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-            <rect x="21" y="36" width="10" height="8" rx="3" fill="#4a80c8"/>
-            <rect x="22" y="22" width="8" height="16" rx="3" fill="#3a70b8"/>
-            <rect x="22" y="14" width="8" height="10" rx="2" fill="#2a60a8"/>
-            <rect x="23" y="7" width="6" height="9" rx="2" fill="#1a50a0"/>
-            <rect x="24" y="2" width="4" height="7" rx="1" fill="#ccc"/>
-            <polygon points="24,2 28,2 26,0" fill="#eee"/>
-            <circle cx="26" cy="22" r="4" fill="#5a90d8"/>
-            <circle cx="26" cy="14" r="3" fill="#4a80c8"/>
-            <ellipse cx="26" cy="44" rx="16" ry="4" fill="#2a2820" opacity="0.3"/>
+<div class="divider"></div>
+
+<!-- ═══════════════════ MODULES ═══════════════════ -->
+<section id="modules" class="section" style="background:var(--ink);position:relative;">
+  <div class="modules-noise"></div>
+  <div class="section-number">03</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">03 · System Modules</div>
+    <h2 class="sec-title reveal reveal-delay-1">Four <em>Integrated</em> Components</h2>
+    <p class="sec-lead reveal reveal-delay-2">Each module feeds intelligently into the next — from photographic identification through to physical robotic execution — completing a full pipeline in ~3.2 seconds per gemstone.</p>
+
+    <div class="mod-showcase reveal">
+      <!-- MODULE 01 -->
+      <div class="mod-card mc1">
+        <span class="mod-tag">Module 01 · Robotic Arm Control</span>
+        <div class="mod-icon-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <!-- Arm segments -->
+            <rect x="27" y="44" width="10" height="14" rx="3" fill="rgba(122,174,248,0.6)"/>
+            <rect x="28" y="30" width="8" height="16" rx="2.5" fill="rgba(74,128,224,0.7)">
+              <animateTransform attributeName="transform" type="rotate" values="-3 32 44;4 32 44;-3 32 44" dur="4s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="28" y="18" width="8" height="14" rx="2.5" fill="rgba(30,79,168,0.8)">
+              <animateTransform attributeName="transform" type="rotate" values="5 32 30;-6 32 30;5 32 30" dur="4s" begin="0.5s" repeatCount="indefinite"/>
+            </rect>
+            <rect x="29" y="9" width="6" height="11" rx="2" fill="rgba(20,50,140,0.9)">
+              <animateTransform attributeName="transform" type="rotate" values="-4 32 18;5 32 18;-4 32 18" dur="4s" begin="1s" repeatCount="indefinite"/>
+            </rect>
+            <!-- Tool tip -->
+            <rect x="30" y="3" width="4" height="8" rx="1" fill="rgba(200,200,200,0.8)"/>
+            <polygon points="30,3 34,3 32,0" fill="rgba(220,220,220,0.9)"/>
+            <!-- Base -->
+            <ellipse cx="32" cy="57" rx="14" ry="4" fill="rgba(122,174,248,0.15)" stroke="rgba(122,174,248,0.3)" stroke-width="0.8"/>
+            <!-- Joint circles -->
+            <circle cx="32" cy="44" r="4" fill="rgba(122,174,248,0.5)" stroke="rgba(122,174,248,0.8)" stroke-width="0.8"/>
+            <circle cx="32" cy="30" r="3.5" fill="rgba(74,128,224,0.5)" stroke="rgba(74,128,224,0.8)" stroke-width="0.8"/>
+            <circle cx="32" cy="18" r="3" fill="rgba(30,79,168,0.6)" stroke="rgba(30,79,168,0.8)" stroke-width="0.8"/>
           </svg>
         </div>
         <div class="mod-title">Robotic Arm Control</div>
-        <p class="mod-body">5-DOF physical prototype with MG996R servos, ESP32-S3, and Raspberry Pi 5 running ROS 2 Jazzy. 6-DOF Gazebo/MoveIt 2 simulation validated for collision-free trajectory planning using D–H kinematics.</p>
-        <span class="mod-badge mb-b">±0.4 mm precision</span>
-        <div style="margin-top:1rem;">
-          <a href="https://github.com/Nihara-D/manipulator_phyisical" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:0.68rem;color:#7fb3f5;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#7fb3f5"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
-            manipulator_phyisical ↗
+        <p class="mod-body">5-DOF physical prototype with MG996R servos, ESP32-S3 microcontroller, and Raspberry Pi 5 running ROS 2 Jazzy. 6-DOF Gazebo Harmonic simulation validated for collision-free trajectory planning using Denavit–Hartenberg kinematic modelling and MoveIt 2.</p>
+        <span class="mod-metric mm-sap">±0.4 mm precision</span>
+        <div>
+          <a class="mod-github" href="https://github.com/Nihara-D/manipulator-hardware" target="_blank" rel="noopener">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+            manipulator-hardware ↗
+          </a>
+          <a class="mod-github" href="https://github.com/Nihara-D/manipulator-sim" target="_blank" rel="noopener" style="margin-left:1rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+            manipulator-sim ↗
           </a>
         </div>
       </div>
-      <div class="mod m2">
-        <div class="mod-n">MODULE 02</div>
-        <div class="mod-icon">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-            <polygon points="26,4 44,15 44,37 26,48 8,37 8,15" fill="none" stroke="#e87070" stroke-width="1.5"/>
-            <polygon points="26,4 44,15 26,24" fill="#f0908080"/>
-            <polygon points="26,4 8,15 26,24" fill="#e0807080"/>
-            <polygon points="44,37 26,48 26,24" fill="#c0505080"/>
-            <polygon points="8,37 26,48 26,24" fill="#d0606080"/>
-            <circle cx="33" cy="10" r="2.5" fill="white" opacity="0.85"/>
-            <circle cx="20" cy="18" r="1.5" fill="white" opacity="0.65"/>
+
+      <!-- MODULE 02 -->
+      <div class="mod-card mc2">
+        <span class="mod-tag">Module 02 · Gem Identification</span>
+        <div class="mod-icon-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="none" stroke="rgba(240,112,144,0.5)" stroke-width="1"/>
+            <polygon points="32,4 56,18 32,28" fill="rgba(240,112,144,0.35)"/>
+            <polygon points="32,4 8,18 32,28" fill="rgba(200,80,112,0.35)"/>
+            <polygon points="56,18 56,46 32,28" fill="rgba(139,26,42,0.45)"/>
+            <polygon points="8,18 8,46 32,28" fill="rgba(200,80,112,0.38)"/>
+            <polygon points="56,46 32,60 32,28" fill="rgba(100,16,32,0.55)"/>
+            <polygon points="8,46 32,60 32,28" fill="rgba(139,26,42,0.5)"/>
+            <circle cx="42" cy="12" r="3.5" fill="white">
+              <animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="22" cy="22" r="2" fill="white">
+              <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+            <!-- Scanner lines -->
+            <line x1="8" y1="32" x2="56" y2="32" stroke="rgba(240,112,144,0.4)" stroke-width="0.8" stroke-dasharray="3 3">
+              <animate attributeName="y1" values="18;46;18" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="y2" values="18;46;18" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
+            </line>
           </svg>
         </div>
         <div class="mod-title">Gem Identification</div>
-        <p class="mod-body">EfficientNetB3 visual features fused with RI, SG, and Mohs hardness constants. Trained on 10,000 samples across 34 Sri Lankan gem types — natural, treated, synthetic, and imitation stones.</p>
-        <span class="mod-badge mb-r">92% accuracy</span>
+        <p class="mod-body">EfficientNetB3 visual features fused with refractive index, specific gravity, and Mohs hardness via late-fusion MLP. Trained on 10,000 samples across 34 Sri Lankan gem types — natural, heat-treated, synthetic, and imitation stones classified simultaneously.</p>
+        <span class="mod-metric mm-rub">92% accuracy</span>
       </div>
-      <div class="mod m3">
-        <div class="mod-n">MODULE 03</div>
-        <div class="mod-icon">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-            <rect x="6" y="10" width="40" height="32" rx="4" fill="none" stroke="#60c090" stroke-width="1.5"/>
-            <circle cx="19" cy="24" r="7" fill="#40a07060"/>
-            <circle cx="19" cy="24" r="3.5" fill="#20804060"/>
-            <line x1="28" y1="18" x2="42" y2="18" stroke="#60c090" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="28" y1="24" x2="38" y2="24" stroke="#60c090" stroke-width="1" stroke-linecap="round"/>
-            <line x1="28" y1="30" x2="42" y2="30" stroke="#60c090" stroke-width="1.5" stroke-linecap="round"/>
+
+      <!-- MODULE 03 -->
+      <div class="mod-card mc3">
+        <span class="mod-tag">Module 03 · Gem Evaluation</span>
+        <div class="mod-icon-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect x="6" y="12" width="52" height="40" rx="4" fill="none" stroke="rgba(74,190,136,0.4)" stroke-width="1"/>
+            <!-- Scan area -->
+            <rect x="12" y="18" width="20" height="20" rx="2" fill="rgba(74,190,136,0.08)" stroke="rgba(74,190,136,0.3)" stroke-width="0.8"/>
+            <circle cx="22" cy="28" r="7" fill="rgba(74,190,136,0.15)"/>
+            <circle cx="22" cy="28" r="4" fill="rgba(74,190,136,0.25)"/>
+            <circle cx="22" cy="28" r="1.5" fill="rgba(74,190,136,0.7)"/>
+            <!-- Crosshairs -->
+            <line x1="22" y1="19" x2="22" y2="23" stroke="rgba(74,190,136,0.5)" stroke-width="0.8"/>
+            <line x1="22" y1="33" x2="22" y2="37" stroke="rgba(74,190,136,0.5)" stroke-width="0.8"/>
+            <line x1="13" y1="28" x2="17" y2="28" stroke="rgba(74,190,136,0.5)" stroke-width="0.8"/>
+            <line x1="27" y1="28" x2="31" y2="28" stroke="rgba(74,190,136,0.5)" stroke-width="0.8"/>
+            <!-- Data bars -->
+            <line x1="38" y1="22" x2="54" y2="22" stroke="rgba(74,190,136,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="38" y1="28" x2="48" y2="28" stroke="rgba(74,190,136,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="38" y1="34" x2="52" y2="34" stroke="rgba(74,190,136,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="38" y1="40" x2="44" y2="40" stroke="rgba(74,190,136,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Scan animation -->
+            <rect x="12" y="18" width="20" height="2" fill="rgba(74,190,136,0.4)">
+              <animate attributeName="y" values="18;36;18" dur="2.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+            </rect>
           </svg>
         </div>
         <div class="mod-title">Gem Evaluation</div>
-        <p class="mod-body">Soft Voting Ensemble (Random Forest, Extra Trees, Gradient Boosting, SVM) for 8-class defect detection using 168-dimensional handcrafted features. HX711 load cell for weight measurement and value estimation.</p>
-        <span class="mod-badge mb-g">F1 = 0.88 ± 0.013</span>
+        <p class="mod-body">Soft Voting Ensemble (Random Forest, Extra Trees, Gradient Boosting, SVM) for 8-class defect detection using 168-dimensional handcrafted features — LBP textures, Gabor filters, HOG descriptors. HX711 load cell integration for carat weight measurement.</p>
+        <span class="mod-metric mm-em">F1 = 0.88 ± 0.013</span>
       </div>
-      <div class="mod m4">
-        <div class="mod-n">MODULE 04</div>
-        <div class="mod-icon">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-            <polygon points="26,4 44,15 44,37 26,48 8,37 8,15" fill="none" stroke="#e8a840" stroke-width="1.5"/>
-            <line x1="26" y1="4" x2="26" y2="48" stroke="#e8a84045" stroke-width="1"/>
-            <line x1="8" y1="15" x2="44" y2="37" stroke="#e8a84045" stroke-width="1"/>
-            <line x1="44" y1="15" x2="8" y2="37" stroke="#e8a84045" stroke-width="1"/>
-            <circle cx="26" cy="26" r="4" fill="#e8a840"/>
-            <circle cx="26" cy="4" r="2" fill="#e8a84080"/>
-            <circle cx="44" cy="15" r="2" fill="#e8a84080"/>
-            <circle cx="44" cy="37" r="2" fill="#e8a84080"/>
-            <circle cx="26" cy="48" r="2" fill="#e8a84080"/>
+
+      <!-- MODULE 04 -->
+      <div class="mod-card mc4">
+        <span class="mod-tag">Module 04 · Cut Recommendation</span>
+        <div class="mod-icon-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <polygon points="32,4 56,18 56,46 32,60 8,46 8,18" fill="none" stroke="rgba(248,208,96,0.4)" stroke-width="1"/>
+            <!-- Internal geometry lines -->
+            <line x1="32" y1="4" x2="32" y2="60" stroke="rgba(248,208,96,0.2)" stroke-width="0.6"/>
+            <line x1="8" y1="18" x2="56" y2="46" stroke="rgba(248,208,96,0.2)" stroke-width="0.6"/>
+            <line x1="56" y1="18" x2="8" y2="46" stroke="rgba(248,208,96,0.2)" stroke-width="0.6"/>
+            <!-- Nodes -->
+            <circle cx="32" cy="4" r="2.5" fill="rgba(248,208,96,0.7)"><animate attributeName="r" values="2.5;4;2.5" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="56" cy="18" r="2" fill="rgba(248,208,96,0.5)"/>
+            <circle cx="56" cy="46" r="2" fill="rgba(248,208,96,0.5)"/>
+            <circle cx="32" cy="60" r="2" fill="rgba(248,208,96,0.5)"/>
+            <circle cx="8" cy="46" r="2" fill="rgba(248,208,96,0.5)"/>
+            <circle cx="8" cy="18" r="2" fill="rgba(248,208,96,0.5)"/>
+            <!-- Center active node -->
+            <circle cx="32" cy="32" r="5" fill="rgba(248,208,96,0.8)">
+              <animate attributeName="r" values="5;7;5" dur="2.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="32" cy="32" r="2" fill="rgba(248,208,96,1)"/>
           </svg>
         </div>
         <div class="mod-title">Cut Recommendation</div>
-        <p class="mod-body">CatBoost predicts cut family (Brilliant, Step, Mixed, Cabochon). XGBoost selects the precise cut type (Round, Oval, Pear, Marquise…). Regression models output crown angle, pavilion, table %, and depth % for the robotic arm.</p>
-        <span class="mod-badge mb-t">84% cut accuracy</span>
+        <p class="mod-body">CatBoost classifier predicts cut family (Brilliant / Step / Mixed / Cabochon). XGBoost selects precise cut type (Round, Oval, Pear, Marquise, Emerald Cut…). Gradient Boosting regression outputs exact crown angle, pavilion depth, table %, and depth % fed to the robotic arm.</p>
+        <span class="mod-metric mm-top">84% cut family accuracy</span>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="divhr"></div>
+<div class="divider"></div>
 
-<!-- MILESTONES -->
-<section id="milestones" style="background:var(--off);">
-  <div class="sec reveal">
-    <div class="eyebrow">03 · Milestones</div>
-    <h2 class="sec-title">Project <em>Timeline</em></h2>
-    <p class="sec-lead">Five assessment checkpoints tracking the research from initial proposal through to final viva. Use the dropdown to view details for each milestone.</p>
+<!-- ═══════════════════ PIPELINE ═══════════════════ -->
+<section id="pipeline" class="section" style="background:var(--ink2);">
+  <div class="section-number">04</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">04 · Processing Pipeline</div>
+    <h2 class="sec-title reveal reveal-delay-1">End-to-End <em>Flow</em></h2>
+    <p class="sec-lead reveal reveal-delay-2">From raw gemstone placed on the sensor stage to completed robotic cut — the entire pipeline executes in approximately 3.2 seconds.</p>
 
-    <div class="ms-dropdown-wrap">
-      <label class="ms-select-lbl" for="msSelect">Select a milestone to view details</label>
-      <select class="ms-select" id="msSelect" onchange="showMilestone(this.value)">
-        <option value="">— Choose an assessment —</option>
-        <option value="all">All Milestones (Overview)</option>
-        <option value="ms1">Project Proposal · Assessment 01</option>
-        <option value="ms2">Progress Presentation I · Assessment 02</option>
-        <option value="ms3">Progress Presentation II · Assessment 03</option>
-        <option value="ms4">Final Assessment · Assessment 04</option>
-        <option value="ms5">Viva Voce · Assessment 05</option>
-      </select>
+    <div class="pipeline-flow reveal">
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 01</div>
+        <div class="pipe-title">Gem Placement</div>
+        <p class="pipe-sub">Stone placed on load cell + imaging stage. Carat weight recorded via HX711.</p>
+        <div class="pipe-time">~0.2s</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 02</div>
+        <div class="pipe-title">Image Capture</div>
+        <p class="pipe-sub">Multi-angle photos via camera module. Lighting normalised by diffuse enclosure.</p>
+        <div class="pipe-time">~0.3s</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 03</div>
+        <div class="pipe-title">Identification</div>
+        <p class="pipe-sub">EfficientNetB3 + physical constants fusion. 34-class prediction with confidence.</p>
+        <div class="pipe-time">~0.6s</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 04</div>
+        <div class="pipe-title">Defect Eval</div>
+        <p class="pipe-sub">168-feature extraction + Soft Voting Ensemble. 8-class defect classification.</p>
+        <div class="pipe-time">~0.5s</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 05</div>
+        <div class="pipe-title">Cut Planning</div>
+        <p class="pipe-sub">CatBoost family → XGBoost type → Regression outputs exact cut parameters.</p>
+        <div class="pipe-time">~0.4s</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-n">STEP 06</div>
+        <div class="pipe-title">Path Generation</div>
+        <p class="pipe-sub">MoveIt 2 plans collision-free trajectory. D–H IK solves joint angles.</p>
+        <div class="pipe-time">~0.7s</div>
+      </div>
+      <div class="pipe-step" style="border-color:rgba(122,174,248,0.2);">
+        <div class="pipe-n">STEP 07</div>
+        <div class="pipe-title">Execution</div>
+        <p class="pipe-sub">ESP32-S3 drives PCA9685 servo commands. Physical cut performed.</p>
+        <div class="pipe-time" style="color:var(--em-xl);">~0.5s</div>
+      </div>
     </div>
 
-    <!-- All Overview -->
-    <div id="panel-all" class="ms-panel">
-      <div class="all-ms-grid">
-        <div class="ms-card done" onclick="selectMs('ms1')">
-          <div class="ms-card-n">ASSESSMENT 01</div>
-          <div class="ms-card-title">Project Proposal</div>
-          <div class="ms-card-meta">Marks Allocated: 10% · Status: Complete</div>
-          <p class="ms-card-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved.</p>
-        </div>
-        <div class="ms-card done" onclick="selectMs('ms2')">
-          <div class="ms-card-n">ASSESSMENT 02</div>
-          <div class="ms-card-title">Progress Presentation I</div>
-          <div class="ms-card-meta">Marks Allocated: 15% · Status: Complete</div>
-          <p class="ms-card-desc">Early system architecture, robotic arm hardware assembly, initial model training, and Gazebo simulation setup.</p>
-        </div>
-        <div class="ms-card done" onclick="selectMs('ms3')">
-          <div class="ms-card-n">ASSESSMENT 03</div>
-          <div class="ms-card-title">Progress Presentation II</div>
-          <div class="ms-card-meta">Marks Allocated: 20% · Status: Complete</div>
-          <p class="ms-card-desc">Full pipeline integration with 92% identification accuracy, F1 0.88 defect detection, 84% cut family prediction, and ROS 2 trajectory execution.</p>
-        </div>
-        <div class="ms-card now" onclick="selectMs('ms4')">
-          <div class="ms-card-n">ASSESSMENT 04</div>
-          <div class="ms-card-title">Final Assessment</div>
-          <div class="ms-card-meta">Marks Allocated: 40% · Status: In Progress</div>
-          <p class="ms-card-desc">Complete system demonstration with all four modules integrated. IEEE-format research paper submission.</p>
-        </div>
-        <div class="ms-card upcoming" onclick="selectMs('ms5')">
-          <div class="ms-card-n">ASSESSMENT 05</div>
-          <div class="ms-card-title">Viva Voce</div>
-          <div class="ms-card-meta">Marks Allocated: 15% · Status: Upcoming</div>
-          <p class="ms-card-desc">Oral examination assessing individual research contributions, technical depth, and future research directions.</p>
-        </div>
+    <div class="pipeline-total reveal">
+      <div>
+        <div class="pt-label">Total Pipeline Latency</div>
+        <div class="pt-val">~3.2s</div>
       </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;"></div>
+      <div>
+        <div class="pt-label">Gem Types Tested</div>
+        <div class="pt-val" style="color:var(--em-xl);">8</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;"></div>
+      <div>
+        <div class="pt-label">End-to-End Success Rate</div>
+        <div class="pt-val" style="color:var(--top-xl);">91.4%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════ MILESTONES ═══════════════════ -->
+<section id="milestones" class="section" style="background:var(--ink);">
+  <div class="section-number">05</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">05 · Milestones</div>
+    <h2 class="sec-title reveal reveal-delay-1">Project <em>Timeline</em></h2>
+    <p class="sec-lead reveal reveal-delay-2">Five assessment checkpoints tracking the research from initial proposal through final viva voce.</p>
+
+    <div class="ms-tabs reveal" role="tablist">
+      <button class="ms-tab active" onclick="switchTab('ms1',this)">01 · Proposal</button>
+      <button class="ms-tab" onclick="switchTab('ms2',this)">02 · Progress I</button>
+      <button class="ms-tab" onclick="switchTab('ms3',this)">03 · Progress II</button>
+      <button class="ms-tab" onclick="switchTab('ms4',this)">04 · Final</button>
+      <button class="ms-tab" onclick="switchTab('ms5',this)">05 · Viva</button>
     </div>
 
     <!-- MS1 -->
-    <div id="panel-ms1" class="ms-panel">
-      <div class="tl">
-        <div class="ms done">
-          <div class="ms-head"><div class="ms-name">Project Proposal</div><span class="ms-badge bd">Complete</span></div>
-          <div class="ms-date">Assessment 01</div>
-          <div class="ms-marks">Marks Allocated: 10%</div>
-          <p class="ms-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved by the SLIIT research panel. Deliverables included the Project Charter, initial proposal document, and signed supervisor agreement.</p>
+    <div id="tab-ms1" class="ms-content active">
+      <div class="ms-sidebar">
+        <span class="ms-status-badge ms-status-done"><span class="dot"></span>Complete</span>
+        <div class="ms-marks-big">10%</div>
+        <div class="ms-marks-label">Marks Allocated</div>
+        <div class="ms-deliverables">
+          <div class="ms-del-title">Deliverables</div>
+          <div class="ms-del-item">Project Charter document</div>
+          <div class="ms-del-item">Formal proposal PDF</div>
+          <div class="ms-del-item">Signed supervisor agreement</div>
+          <div class="ms-del-item">Initial literature review</div>
+          <div class="ms-del-item">Preliminary timeline</div>
+        </div>
+      </div>
+      <div>
+        <div class="ms-main-id">ASSESSMENT 01</div>
+        <div class="ms-main-title">Project Proposal</div>
+        <p class="ms-main-desc">Concept definition, literature survey, problem statement, research objectives, and proposed methodology submitted and approved by the SLIIT research panel. Covered gemstone industry context, gap analysis, and proposed four-module architecture. The proposal outlined multimodal fusion strategies and robotic execution frameworks not previously combined for Sri Lankan gem types.</p>
+        <div style="padding:1.5rem;border:1px solid rgba(74,190,136,0.15);background:rgba(14,90,56,0.08);font-size:0.85rem;line-height:1.8;color:rgba(255,255,255,0.4);">
+          <span style="color:var(--em-xl);font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.5rem;">Status Note</span>
+          All proposal documents reviewed and approved. Supervisor agreement signed. Research ethics clearance from GJRTI initiated at this stage.
         </div>
       </div>
     </div>
+
     <!-- MS2 -->
-    <div id="panel-ms2" class="ms-panel">
-      <div class="tl">
-        <div class="ms done">
-          <div class="ms-head"><div class="ms-name">Progress Presentation I</div><span class="ms-badge bd">Complete</span></div>
-          <div class="ms-date">Assessment 02</div>
-          <div class="ms-marks">Marks Allocated: 15%</div>
-          <p class="ms-desc">Demonstrated early system architecture, robotic arm hardware assembly (5-DOF prototype), initial gemstone identification model training, and Gazebo simulation setup with RViz visualization. Presented dataset collection methodology and preliminary accuracy results.</p>
+    <div id="tab-ms2" class="ms-content">
+      <div class="ms-sidebar">
+        <span class="ms-status-badge ms-status-done"><span class="dot"></span>Complete</span>
+        <div class="ms-marks-big">15%</div>
+        <div class="ms-marks-label">Marks Allocated</div>
+        <div class="ms-deliverables">
+          <div class="ms-del-title">Deliverables</div>
+          <div class="ms-del-item">System architecture design</div>
+          <div class="ms-del-item">Hardware assembly report</div>
+          <div class="ms-del-item">Gazebo simulation setup</div>
+          <div class="ms-del-item">Initial ML model results</div>
+          <div class="ms-del-item">Dataset collection report</div>
+        </div>
+      </div>
+      <div>
+        <div class="ms-main-id">ASSESSMENT 02</div>
+        <div class="ms-main-title">Progress Presentation I</div>
+        <p class="ms-main-desc">Demonstrated early system architecture, 5-DOF robotic arm hardware assembly with MG996R servos and ESP32-S3, initial gemstone identification model training on 3,000 samples, and Gazebo Harmonic simulation with RViz visualisation. Dataset collection methodology validated by GJRTI data access.</p>
+        <div class="ms-results-grid">
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--sap-xl);">5-DOF</span><span class="ms-result-l">Physical Prototype</span></div>
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--em-xl);">3K</span><span class="ms-result-l">Samples Collected</span></div>
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--top-xl);">Sim</span><span class="ms-result-l">Gazebo Validated</span></div>
         </div>
       </div>
     </div>
+
     <!-- MS3 -->
-    <div id="panel-ms3" class="ms-panel">
-      <div class="tl">
-        <div class="ms done">
-          <div class="ms-head"><div class="ms-name">Progress Presentation II</div><span class="ms-badge bd">Complete</span></div>
-          <div class="ms-date">Assessment 03</div>
-          <div class="ms-marks">Marks Allocated: 20%</div>
-          <p class="ms-desc">Full pipeline integration: 92% identification accuracy, F1 0.88 defect detection, 84% cut family prediction, and ROS 2 trajectory execution verified across 50 test runs on 8 gemstone types. All four modules demonstrated end-to-end.</p>
+    <div id="tab-ms3" class="ms-content">
+      <div class="ms-sidebar">
+        <span class="ms-status-badge ms-status-done"><span class="dot"></span>Complete</span>
+        <div class="ms-marks-big">20%</div>
+        <div class="ms-marks-label">Marks Allocated</div>
+        <div class="ms-deliverables">
+          <div class="ms-del-title">Deliverables</div>
+          <div class="ms-del-item">Full pipeline integration</div>
+          <div class="ms-del-item">All 4 modules demonstrated</div>
+          <div class="ms-del-item">50-run test results</div>
+          <div class="ms-del-item">End-to-end video demo</div>
+          <div class="ms-del-item">Individual progress reports</div>
+        </div>
+      </div>
+      <div>
+        <div class="ms-main-id">ASSESSMENT 03</div>
+        <div class="ms-main-title">Progress Presentation II</div>
+        <p class="ms-main-desc">Full four-module pipeline demonstrated end-to-end. 50 test runs across 8 gemstone types — Blue Sapphire, Ruby, Spinel, Moonstone, Alexandrite, Garnet, Topaz, and Quartz — with complete ROS 2 trajectory execution. All key metrics achieved.</p>
+        <div class="ms-results-grid">
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--sap-xl);">92%</span><span class="ms-result-l">ID Accuracy</span></div>
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--em-xl);">0.88</span><span class="ms-result-l">Defect F1</span></div>
+          <div class="ms-result"><span class="ms-result-n" style="color:var(--top-xl);">84%</span><span class="ms-result-l">Cut Accuracy</span></div>
         </div>
       </div>
     </div>
+
     <!-- MS4 -->
-    <div id="panel-ms4" class="ms-panel">
-      <div class="tl">
-        <div class="ms now">
-          <div class="ms-head"><div class="ms-name">Final Assessment</div><span class="ms-badge ba">In Progress</span></div>
-          <div class="ms-date">Assessment 04</div>
-          <div class="ms-marks">Marks Allocated: 40%</div>
-          <p class="ms-desc">Complete system demonstration with all four modules integrated. Final IEEE-format research paper submission covering results across Blue Sapphire, Ruby, Spinel, Moonstone, Alexandrite, Garnet, Topaz, and Quartz. Includes four individual research documents per team member.</p>
+    <div id="tab-ms4" class="ms-content">
+      <div class="ms-sidebar">
+        <span class="ms-status-badge ms-status-now"><span class="dot"></span>In Progress</span>
+        <div class="ms-marks-big">40%</div>
+        <div class="ms-marks-label">Marks Allocated</div>
+        <div class="ms-deliverables">
+          <div class="ms-del-title">Deliverables</div>
+          <div class="ms-del-item">Full system demonstration</div>
+          <div class="ms-del-item">IEEE-format main paper</div>
+          <div class="ms-del-item">4× individual research docs</div>
+          <div class="ms-del-item">Complete test dataset</div>
+          <div class="ms-del-item">Final poster</div>
+        </div>
+      </div>
+      <div>
+        <div class="ms-main-id">ASSESSMENT 04</div>
+        <div class="ms-main-title">Final Assessment</div>
+        <p class="ms-main-desc">Complete system demonstration integrating all four modules before the examination panel. IEEE-format main research paper submission covering results across all 8 gemstone types. Each team member submits individual research documentation for their respective module. This is the highest-weighted assessment at 40%.</p>
+        <div style="padding:1.5rem;border:1px solid rgba(184,120,0,0.2);background:rgba(184,120,0,0.06);font-size:0.85rem;line-height:1.8;color:rgba(255,255,255,0.4);">
+          <span style="color:var(--top-xl);font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.5rem;">Currently Active</span>
+          Final system integration underway. IEEE paper in draft. All four modules tested individually — final end-to-end stress testing in progress.
         </div>
       </div>
     </div>
+
     <!-- MS5 -->
-    <div id="panel-ms5" class="ms-panel">
-      <div class="tl">
-        <div class="ms">
-          <div class="ms-head"><div class="ms-name">Viva Voce</div><span class="ms-badge bs">Upcoming</span></div>
-          <div class="ms-date">Assessment 05</div>
-          <div class="ms-marks">Marks Allocated: 15%</div>
-          <p class="ms-desc">Oral examination assessing individual research contributions, technical depth, and future research directions before the SLIIT examination panel. Each team member presents and defends their individual module contribution.</p>
+    <div id="tab-ms5" class="ms-content">
+      <div class="ms-sidebar">
+        <span class="ms-status-badge ms-status-up">Upcoming</span>
+        <div class="ms-marks-big">15%</div>
+        <div class="ms-marks-label">Marks Allocated</div>
+        <div class="ms-deliverables">
+          <div class="ms-del-title">Deliverables</div>
+          <div class="ms-del-item">Individual oral defence</div>
+          <div class="ms-del-item">Technical Q&amp;A session</div>
+          <div class="ms-del-item">Module contribution proof</div>
+          <div class="ms-del-item">Future directions discussion</div>
         </div>
+      </div>
+      <div>
+        <div class="ms-main-id">ASSESSMENT 05</div>
+        <div class="ms-main-title">Viva Voce</div>
+        <p class="ms-main-desc">Oral examination assessing individual research contributions, technical depth, and future research directions before the SLIIT examination panel. Each team member presents and defends their individual module contribution — robotic control, identification, evaluation, or cut recommendation — with cross-examination on the integrated system.</p>
       </div>
     </div>
   </div>
 </section>
 
-<div class="divhr"></div>
+<div class="divider"></div>
 
-<!-- DOCUMENTS -->
-<section id="documents" style="background:var(--white);">
-  <div class="sec reveal">
-    <div class="eyebrow">04 · Documents</div>
-    <h2 class="sec-title">Research <em>Documents</em></h2>
-    <p class="sec-lead">All project deliverables, research papers, and supporting documentation produced throughout the research lifecycle.</p>
-    <div class="docs-grid">
-      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC5ykAj7Kq2RroZjxYwoKlbAUDkG9w029KH0wcD4cLaAuw?e=fMEh5X" target="_blank" rel="noopener">
+<!-- ═══════════════════ DOCUMENTS ═══════════════════ -->
+<section id="documents" class="section" style="background:var(--ink2);">
+  <div class="section-number">06</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">06 · Documents</div>
+    <h2 class="sec-title reveal reveal-delay-1">Research <em>Documents</em></h2>
+    <p class="sec-lead reveal reveal-delay-2">All deliverables, papers, and repositories produced across the research lifecycle.</p>
+
+    <div class="docs-masonry reveal">
+      <a class="doc-card" href="https://drive.google.com/drive/folders/1SnJogsFnIdipJbwtm9e-9ex21CLWVUDd?usp=drive_link" target="_blank" rel="noopener">
         <div class="doc-type">PDF · Proposal</div>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="2" width="24" height="28" rx="3" fill="none" stroke="rgba(122,174,248,0.3)" stroke-width="1"/><line x1="8" y1="10" x2="24" y2="10" stroke="rgba(122,174,248,0.4)" stroke-width="1"/><line x1="8" y1="15" x2="24" y2="15" stroke="rgba(122,174,248,0.2)" stroke-width="1"/><line x1="8" y1="20" x2="18" y2="20" stroke="rgba(122,174,248,0.2)" stroke-width="1"/></svg>
+        </div>
         <div class="doc-name">Individual &amp; Proposal Reports</div>
         <p class="doc-desc">Individual research reports and the formal proposal document covering literature review, methodology, objectives, and project timeline for RP-25J-231.</p>
-        <span class="doc-lnk">↗ Open in SharePoint</span>
+        <span class="doc-link">Open in SharePoint <span>→</span></span>
       </a>
-      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgB6IQtxYt1xTrfwGwE_aA_SAfBfd-rxH1xWLs-FR65PFcA?e=1BeK8e" target="_blank" rel="noopener">
+      <a class="doc-card" href="https://drive.google.com/drive/folders/1CS6lC7urHm9e0XPV45t4eDHfWiYMCEFb?usp=drive_link" target="_blank" rel="noopener">
         <div class="doc-type">DOC · Checklists</div>
-        <div class="doc-name">Check List Documents</div>
-        <p class="doc-desc">Assessment checklists and evaluation criteria for each milestone as per SLIIT research guidelines.</p>
-        <span class="doc-lnk">↗ Open in SharePoint</span>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="2" width="24" height="28" rx="3" fill="none" stroke="rgba(74,190,136,0.3)" stroke-width="1"/><polyline points="8,11 11,14 16,8" stroke="rgba(74,190,136,0.5)" stroke-width="1.2" fill="none"/><line x1="18" y1="11" x2="24" y2="11" stroke="rgba(74,190,136,0.25)" stroke-width="1"/><polyline points="8,20 11,23 16,17" stroke="rgba(74,190,136,0.35)" stroke-width="1.2" fill="none"/><line x1="18" y1="20" x2="24" y2="20" stroke="rgba(74,190,136,0.2)" stroke-width="1"/></svg>
+        </div>
+        <div class="doc-name">Assessment Checklists</div>
+        <p class="doc-desc">Assessment checklists and evaluation criteria for each milestone as per SLIIT research guidelines and submission requirements.</p>
+        <span class="doc-link">Open in SharePoint <span>→</span></span>
       </a>
-      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC8IO-S5XaHSbIRlb-4sD9PAdhWy4HhMZ8pva-9AiXIjtk?e=6IgyKT" target="_blank" rel="noopener">
+      <a class="doc-card" href="https://drive.google.com/drive/folders/1pjT9Q-BBA9jxppVmYgRtsxkPm58kClfj?usp=drive_link" target="_blank" rel="noopener">
         <div class="doc-type">PDF · Final Reports</div>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="2" width="24" height="28" rx="3" fill="none" stroke="rgba(248,208,96,0.3)" stroke-width="1"/><polygon points="16,8 22,16 16,24 10,16" fill="rgba(248,208,96,0.15)" stroke="rgba(248,208,96,0.4)" stroke-width="0.8"/></svg>
+        </div>
         <div class="doc-name">Final Reports — Individual &amp; Main</div>
-        <p class="doc-desc">IEEE-format main research paper plus individual final documents for each team member covering their respective project module contributions.</p>
-        <span class="doc-lnk">↗ Open in SharePoint</span>
+        <p class="doc-desc">IEEE-format main research paper plus individual final documents for each team member covering respective module contributions and experimental results.</p>
+        <span class="doc-link">Open in SharePoint <span>→</span></span>
       </a>
-      <a class="doc" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
-        <div class="doc-type">GitHub · Full Project</div>
+      <a class="doc-card" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+        <div class="doc-type">GitHub · Main Repository</div>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 2C8.27 2 2 8.27 2 16c0 6.19 4.01 11.44 9.57 13.3.7.13.95-.3.95-.68v-2.35c-3.88.84-4.7-1.88-4.7-1.88-.63-1.63-1.55-2.06-1.55-2.06-1.27-.87.1-.85.1-.85 1.4.1 2.14 1.44 2.14 1.44 1.24 2.13 3.26 1.52 4.06 1.16.13-.9.49-1.52.89-1.87-3.1-.35-6.36-1.55-6.36-6.88 0-1.52.54-2.76 1.43-3.73-.14-.35-.62-1.77.14-3.68 0 0 1.17-.38 3.83 1.43 1.11-.31 2.3-.46 3.49-.47 1.18 0 2.38.16 3.49.47 2.66-1.81 3.83-1.43 3.83-1.43.76 1.91.28 3.33.14 3.68.89.97 1.43 2.21 1.43 3.73 0 5.34-3.27 6.52-6.38 6.87.5.43.96 1.28.96 2.58v3.83c0 .38.25.82.96.68C25.99 27.44 30 22.19 30 16 30 8.27 23.73 2 16 2z" fill="rgba(122,174,248,0.4)"/></svg>
+        </div>
         <div class="doc-name">Full Project Repository</div>
-        <p class="doc-desc">Complete source code for the intelligent gem cutting robotic arm research — all four modules, datasets, training scripts, and ROS 2 workspace.</p>
-        <span class="doc-lnk">↗ View on GitHub</span>
+        <p class="doc-desc">Complete source code — all four modules, datasets, training scripts, ROS 2 workspace, URDF models, and simulation configs.</p>
+        <span class="doc-link">View on GitHub <span>→</span></span>
       </a>
-      <a class="doc" href="https://github.com/Nihara-D/manipulator_phyisical" target="_blank" rel="noopener">
-        <div class="doc-type">GitHub · Robotic Arm</div>
-        <div class="doc-name">Robotic Arm Control Repository</div>
-        <p class="doc-desc">Physical manipulator control code — ESP32-S3, ROS 2 Jazzy, MoveIt 2, servo drivers, and D–H kinematic implementation for the 5-DOF prototype.</p>
-        <span class="doc-lnk">↗ View on GitHub</span>
+      <a class="doc-card" href="https://github.com/Nihara-D/manipulator-hardware" target="_blank" rel="noopener">
+        <div class="doc-type">GitHub · Hardware Control</div>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="12" y="20" width="8" height="8" rx="2" fill="none" stroke="rgba(240,112,144,0.3)" stroke-width="1"/><rect x="13" y="12" width="6" height="10" rx="1.5" fill="none" stroke="rgba(240,112,144,0.4)" stroke-width="0.8"/><rect x="14" y="6" width="4" height="8" rx="1" fill="none" stroke="rgba(240,112,144,0.5)" stroke-width="0.8"/><rect x="15" y="2" width="2" height="6" rx="0.5" fill="rgba(200,200,200,0.5)"/></svg>
+        </div>
+        <div class="doc-name">Robotic Arm Hardware</div>
+        <p class="doc-desc">Physical manipulator control — ESP32-S3, ROS 2 Jazzy, MoveIt 2, PCA9685 servo driver, HX711 load cell, and D–H kinematic implementation for 5-DOF prototype.</p>
+        <span class="doc-link">View on GitHub <span>→</span></span>
       </a>
-      <a class="doc" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgC5ykAj7Kq2RroZjxYwoKlbAUDkG9w029KH0wcD4cLaAuw?e=fMEh5X" target="_blank" rel="noopener">
-        <div class="doc-type">PDF · Ethics</div>
-        <div class="doc-name">Ethics Clearance</div>
-        <p class="doc-desc">Official ethical clearance from SLIIT and data collection approval from the Gem and Jewellery Research and Training Institute (GJRTI).</p>
-        <span class="doc-lnk">↗ Open in SharePoint</span>
+      <a class="doc-card" href="https://github.com/Nihara-D/manipulator-sim" target="_blank" rel="noopener">
+        <div class="doc-type">GitHub · Simulation</div>
+        <div class="doc-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="18" rx="3" fill="none" stroke="rgba(74,190,136,0.3)" stroke-width="1"/><rect x="8" y="10" width="16" height="10" rx="1.5" fill="rgba(74,190,136,0.08)"/><rect x="13" y="24" width="6" height="3" rx="1" fill="rgba(74,190,136,0.2)"/><line x1="10" y1="27" x2="22" y2="27" stroke="rgba(74,190,136,0.2)" stroke-width="1"/></svg>
+        </div>
+        <div class="doc-name">Gazebo Simulation Repo</div>
+        <p class="doc-desc">6-DOF Gazebo Harmonic simulation environment with URDF models, MoveIt 2 config, RViz setup, and collision-free trajectory validation scripts.</p>
+        <span class="doc-link">View on GitHub <span>→</span></span>
+      </a>
+
+      <a class="doc-card" href="https://drive.google.com/drive/folders/1skyd7EA19QYuaDDBGkv1yub98kmlQOHU?usp=drive_link" target="_blank" rel="noopener">
+
+  <div class="doc-type">Research Paper · Publication</div>
+
+  <div class="doc-icon">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect x="6" y="4" width="20" height="24" rx="2"
+            fill="none" stroke="rgba(74,190,136,0.3)" stroke-width="1"/>
+      <line x1="10" y1="10" x2="22" y2="10" stroke="rgba(74,190,136,0.2)"/>
+      <line x1="10" y1="14" x2="22" y2="14" stroke="rgba(74,190,136,0.2)"/>
+      <line x1="10" y1="18" x2="20" y2="18" stroke="rgba(74,190,136,0.2)"/>
+    </svg>
+  </div>
+
+  <div class="doc-name">Intelligent Gem Cutting System Research</div>
+
+  <p class="doc-desc">
+    A comprehensive study on AI-driven robotic gem cutting using computer vision,
+    trajectory planning, and precision manipulation for automated gemstone processing.
+  </p>
+
+  <span class="doc-link">Read Paper <span>→</span></span>
+
+</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════ SLIDES ═══════════════════ -->
+<section id="slides" class="section" style="background:var(--ink);">
+  <div class="section-number">07</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">07 · Presentations</div>
+    <h2 class="sec-title reveal reveal-delay-1">Slide <em>Decks</em></h2>
+    <p class="sec-lead reveal reveal-delay-2">Assessment presentation decks. Slides are uploaded to SharePoint after each presentation is delivered.</p>
+
+    <div class="slides-row reveal">
+      <a class="slide-card" href="https://drive.google.com/drive/folders/1SnJogsFnIdipJbwtm9e-9ex21CLWVUDd?usp=drive_link" target="_blank" rel="noopener">
+        <div class="slide-thumb" style="background:linear-gradient(145deg,rgba(30,79,168,0.15),rgba(30,79,168,0.05));">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <polygon points="40,6 70,23 70,57 40,74 10,57 10,23" fill="none" stroke="rgba(122,174,248,0.4)" stroke-width="1"/>
+            <polygon points="40,6 70,23 40,36" fill="rgba(122,174,248,0.3)"/>
+            <polygon points="40,6 10,23 40,36" fill="rgba(74,128,224,0.3)"/>
+            <polygon points="70,23 70,57 40,36" fill="rgba(30,79,168,0.35)"/>
+            <polygon points="10,23 10,57 40,36" fill="rgba(74,128,224,0.28)"/>
+            <circle cx="54" cy="16" r="4" fill="white" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="slide-body">
+          <div class="slide-title">Proposal &amp; PP1</div>
+          <div class="slide-sub">Assessment 01 &amp; 02 · SharePoint</div>
+        </div>
+      </a>
+      <a class="slide-card" href="https://drive.google.com/drive/folders/1h15lLgDn_abcSJ4cnNCHNy8L-gbOy-fL?usp=drive_link" target="_blank" rel="noopener">
+        <div class="slide-thumb" style="background:linear-gradient(145deg,rgba(139,26,42,0.15),rgba(139,26,42,0.04));">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect x="12" y="44" width="16" height="28" rx="2" fill="rgba(200,80,112,0.5)"/>
+            <rect x="32" y="28" width="16" height="44" rx="2" fill="rgba(200,80,112,0.65)"/>
+            <rect x="52" y="12" width="16" height="60" rx="2" fill="rgba(240,112,144,0.8)"/>
+          </svg>
+        </div>
+        <div class="slide-body">
+          <div class="slide-title">Progress Presentation II</div>
+          <div class="slide-sub">Assessment 03 · SharePoint</div>
+        </div>
+      </a>
+      <a class="slide-card" href="https://drive.google.com/drive/folders/1QJ8D4SqSbWXL4PtR_NzJ-zEIZxPp_QqT?usp=drive_link" target="_blank" rel="noopener">
+        <div class="slide-thumb" style="background:linear-gradient(145deg,rgba(14,90,56,0.15),rgba(14,90,56,0.04));">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="28" fill="none" stroke="rgba(74,190,136,0.4)" stroke-width="1"/>
+            <path d="M40,12 A28,28 0 0 1 68,40" fill="rgba(74,190,136,0.2)"/>
+            <path d="M68,40 A28,28 0 0 1 40,68" fill="rgba(74,190,136,0.15)"/>
+            <path d="M40,68 A28,28 0 0 1 12,40" fill="rgba(74,190,136,0.1)"/>
+            <path d="M12,40 A28,28 0 0 1 40,12" fill="rgba(74,190,136,0.06)"/>
+            <circle cx="40" cy="40" r="8" fill="rgba(74,190,136,0.4)" stroke="rgba(74,190,136,0.6)" stroke-width="1"/>
+            <text x="40" y="44" text-anchor="middle" font-family="'Space Mono',monospace" font-size="8" fill="rgba(74,190,136,0.9)">FINAL</text>
+          </svg>
+        </div>
+        <div class="slide-body">
+          <div class="slide-title">Final Presentation</div>
+          <div class="slide-sub">Assessment 04 · SharePoint</div>
+        </div>
+      </a>
+      <a class="slide-card" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+        <div class="slide-thumb" style="background:linear-gradient(145deg,rgba(20,16,10,0.8),rgba(10,8,6,0.9));">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <path d="M40 8C22.33 8 8 22.33 8 40c0 14.14 9.17 26.14 21.87 30.4 1.6.3 2.18-.69 2.18-1.54v-5.38c-8.87 1.93-10.73-4.27-10.73-4.27-1.45-3.68-3.54-4.66-3.54-4.66-2.9-1.98.22-1.94.22-1.94 3.2.22 4.89 3.29 4.89 3.29 2.84 4.88 7.46 3.47 9.28 2.65.28-2.06.91-3.47 1.66-4.27-7.08-.8-14.53-3.54-14.53-15.76 0-3.48 1.24-6.33 3.28-8.56-.33-.8-1.42-4.05.31-8.44 0 0 2.67-.86 8.76 3.27 2.54-.71 5.26-.86 7.97-.87 2.71 0 5.44.29 7.97.87 6.08-4.13 8.76-3.27 8.76-3.27 1.73 4.39.64 7.64.31 8.44 2.04 2.23 3.28 5.08 3.28 8.56 0 12.25-7.46 14.95-14.56 15.74.75.64 1.42 1.91 1.42 3.85v5.7c0 .65.43 1.41 1.78 1.17C62.83 66.14 72 54.14 72 40 72 22.33 57.67 8 40 8z" fill="rgba(122,174,248,0.55)"/>
+          </svg>
+        </div>
+        <div class="slide-body">
+          <div class="slide-title">Full Project Repository</div>
+          <div class="slide-sub">GitHub · All Source Code</div>
+        </div>
       </a>
     </div>
   </div>
 </section>
 
-<div class="divhr"></div>
+<div class="divider"></div>
 
-<!-- SLIDES -->
-<section id="slides" style="background:var(--off);">
-  <div class="sec reveal">
-    <div class="eyebrow">05 · Presentations</div>
-    <h2 class="sec-title">Presentation <em>Slides</em></h2>
-    <p class="sec-lead">Slide decks from each assessment presentation. Upcoming presentations will be added once conducted.</p>
-    <div class="slides-grid">
-      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgASiTz936MYRIArwobf3gnNAenbU1TIXIqzMQ2LU7Qhqw0?e=Di7Ue2" target="_blank" rel="noopener">
-        <div class="sthumb" style="background:linear-gradient(135deg,#e8f0fb,#d0e4f8);">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <polygon points="32,6 54,19 54,45 32,58 10,45 10,19" fill="none" stroke="#1e4a8a" stroke-width="1.5"/>
-            <polygon points="32,6 54,19 32,30" fill="#4a90e860"/>
-            <polygon points="32,6 10,19 32,30" fill="#3a80d860"/>
-            <polygon points="54,45 32,58 32,30" fill="#1a50a060"/>
-            <polygon points="10,45 32,58 32,30" fill="#2060b060"/>
-            <circle cx="40" cy="13" r="3.5" fill="white" opacity="0.7"/>
-          </svg>
-        </div>
-        <div class="sbody"><div class="stitle">Proposal &amp; PP1 Slides</div><div class="ssub">Assessment 01 &amp; 02 · SharePoint</div></div>
-      </a>
-      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgCK9BIC_-7RRo5OuBAzsP61AWvBkgpkB10TJsFZfD3Z98g?e=AIsst3" target="_blank" rel="noopener">
-        <div class="sthumb" style="background:linear-gradient(135deg,#fbeaea,#f5d0d0);">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <rect x="10" y="34" width="12" height="24" rx="2" fill="#c0392b80"/>
-            <rect x="26" y="22" width="12" height="36" rx="2" fill="#c0392b90"/>
-            <rect x="42" y="10" width="12" height="48" rx="2" fill="#c0392b"/>
-          </svg>
-        </div>
-        <div class="sbody"><div class="stitle">Progress Presentation II</div><div class="ssub">Assessment 03 · SharePoint</div></div>
-      </a>
-      <a class="scard" href="https://mysliit.sharepoint.com/:f:/s/CDAPSubmissionCloud/IgDghz0tXtwMTqXFVnTRHz7gAf--aFsQBQcrF_BEkJotnRg?e=9HnFgS" target="_blank" rel="noopener">
-        <div class="sthumb" style="background:linear-gradient(135deg,#e8f5ee,#d0ecd8);">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <circle cx="32" cy="32" r="22" fill="none" stroke="#1a6645" stroke-width="1.5"/>
-            <path d="M32,10 A22,22 0 0 1 54,32" fill="#1a664540"/>
-            <path d="M54,32 A22,22 0 0 1 32,54" fill="#1a664530"/>
-            <path d="M32,54 A22,22 0 0 1 10,32" fill="#1a664520"/>
-            <path d="M10,32 A22,22 0 0 1 32,10" fill="#1a664510"/>
-            <text x="32" y="36" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#1a6645">Final</text>
-          </svg>
-        </div>
-        <div class="sbody"><div class="stitle">Final Presentation</div><div class="ssub">Assessment 04 · SharePoint</div></div>
-      </a>
-      <a class="scard" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
-        <div class="sthumb" style="background:linear-gradient(135deg,#1a1510,#2c2418);">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-            <path d="M32 8C18.7 8 8 18.7 8 32c0 10.6 6.9 19.6 16.4 22.8 1.2.2 1.6-.5 1.6-1.2v-4.2c-6.7 1.5-8.1-3.2-8.1-3.2-1.1-2.8-2.7-3.5-2.7-3.5-2.2-1.5.2-1.5.2-1.5 2.4.2 3.7 2.5 3.7 2.5 2.1 3.6 5.6 2.6 6.9 2 .2-1.5.8-2.6 1.5-3.2-5.3-.6-10.9-2.7-10.9-11.9 0-2.6.9-4.8 2.5-6.4-.2-.6-1.1-3.1.2-6.4 0 0 2-.6 6.6 2.5 1.9-.5 4-.8 6-.8s4.1.3 6 .8c4.6-3.1 6.6-2.5 6.6-2.5 1.3 3.3.5 5.8.2 6.4 1.5 1.7 2.5 3.8 2.5 6.4 0 9.2-5.6 11.2-11 11.8.9.8 1.6 2.3 1.6 4.6v6.8c0 .7.4 1.4 1.7 1.2C49.1 51.6 56 42.6 56 32 56 18.7 45.3 8 32 8z" fill="white" opacity="0.85"/>
-          </svg>
-        </div>
-        <div class="sbody"><div class="stitle">Full Project Repo</div><div class="ssub">GitHub · All Modules</div></div>
-      </a>
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<section id="about" class="section" style="background:var(--ink2);">
+  <div class="section-number">08</div>
+  <div class="section-inner">
+    <div class="eyebrow reveal">08 · About Us</div>
+    <h2 class="sec-title reveal reveal-delay-1">Meet the <em>Team</em></h2>
+    <p class="sec-lead reveal reveal-delay-2">Final year students from the Department of Information Technology, Sri Lanka Institute of Information Technology (SLIIT), Malabe — under the AIMS Research Group.</p>
+
+    <div class="supervisor-card reveal">
+
+ <!-- Supervisor 1 -->
+<div class="supervisor">
+  <img class="avatar"
+       src="images/harshanath.jpg"
+       alt="Mr. S M Buddhika Harshanath">
+
+  <div>
+    <div class="sup-name">Mr. S M Buddhika Harshanath</div>
+    <div class="sup-dept">Department of Information Technology · SLIIT, Malabe · AIMS Research Group</div>
+    <a class="sup-email" href="mailto:harshanath.s@sliit.lk">
+      harshanath.s@sliit.lk
+    </a>
+  </div>
+</div>
+
+<!-- Supervisor 2 -->
+<div class="supervisor">
+  <img class="avatar"
+       src="images/smanatha.jpeg"
+       alt="Prof. Samantha Rajapaksha">
+
+  <div>
+    <div class="sup-name">Prof. Samantha Rajapaksha</div>
+    <div class="sup-dept">Department of Information Technology · SLIIT, Malabe · AIMS Research Group</div>
+    <a class="sup-email" href="mailto:samantha.r@sliit.lk">
+      samantha.r@sliit.lk
+    </a>
+  </div>
+</div>
+
+</div>
+
+    <div class="team-grid reveal">
+
+  <!-- Nihara -->
+  <div class="team-card tc1">
+    <img class="team-av" src="images/nihara.jpg" alt="Nihara Randini Dayarathne">
+
+    <div class="team-name">Nihara Randini Dayarathne</div>
+    <div class="team-id">IT22581198</div>
+    <a class="team-email" href="mailto:it22581198@my.sliit.lk">
+      it22581198@my.sliit.lk
+    </a>
+    <div class="team-module tm1">Robotic Arm Control</div>
+  </div>
+
+  <!-- Lakshi -->
+  <div class="team-card tc2">
+    <img class="team-av" src="images/lakshi.jpg" alt="Lakshi Tharushika">
+
+    <div class="team-name">Lakshi Tharushika</div>
+    <div class="team-id">IT22570130</div>
+    <a class="team-email" href="mailto:it22570130@my.sliit.lk">
+      it22570130@my.sliit.lk
+    </a>
+    <div class="team-module tm2">Gem Identification</div>
+  </div>
+
+  <!-- Shashikala Beddegamage -->
+  <div class="team-card tc3">
+    <img class="team-av" src="images/shashikala.png" alt="Shashikala Beddegamage">
+
+    <div class="team-name">Shashikala Beddegamage</div>
+    <div class="team-id">IT22565112</div>
+    <a class="team-email" href="mailto:it22565112@my.sliit.lk">
+      it22565112@my.sliit.lk
+    </a>
+    <div class="team-module tm3">Gem Evaluation</div>
+  </div>
+
+  <!-- Shashikala Dilrukshi -->
+  <div class="team-card tc4">
+    <img class="team-av" src="images/shashi.png" alt="Shashikala Dilrukshi">
+
+    <div class="team-name">Shashikala Dilrukshi</div>
+    <div class="team-id">IT22607850</div>
+    <a class="team-email" href="mailto:it22607850@my.sliit.lk">
+      it22607850@my.sliit.lk
+    </a>
+    <div class="team-module tm4">Cut Recommendation</div>
+  </div>
+
+</div>
+
+    <div style="margin-top:2.5rem;padding:2rem;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);font-size:0.9rem;line-height:1.85;color:rgba(255,255,255,0.35);" class="reveal">
+      This project is conducted under the <span style="color:rgba(255,255,255,0.7);">Autonomous Intelligent Machines and Systems (AIMS)</span> research group at SLIIT. Ethical clearance obtained from SLIIT, with gemstone data access approved by the <span style="color:rgba(255,255,255,0.7);">Gem and Jewellery Research and Training Institute (GJRTI)</span>, Sri Lanka. All data collected is strictly for research purposes and non-commercial.
     </div>
   </div>
 </section>
 
-<div class="divhr"></div>
+<div class="divider"></div>
 
-<!-- ABOUT US -->
-<section id="about" style="background:var(--white);">
-  <div class="sec reveal">
-    <div class="eyebrow">06 · About Us</div>
-    <h2 class="sec-title">Meet the <em>Team</em></h2>
-    <p class="sec-lead">Final year students from the Department of Information Technology, Sri Lanka Institute of Information Technology (SLIIT), Malabe.</p>
-    <div class="sup-row">
-      <div class="sup-av">B</div>
-      <div>
-        <div class="sup-lbl">Project Supervisor</div>
-        <div class="sup-name">Mr. S M Buddhika Harshanath</div>
-        <div class="sup-dept">Department of Information Technology · Sri Lanka Institute of Information Technology (SLIIT)</div>
-        <a class="sup-email" href="mailto:harshanath.s@sliit.lk">harshanath.s@sliit.lk</a>
-      </div>
-    </div>
-    <div class="team-grid">
-      <div class="mem">
-        <div class="mem-av" style="background:#1e4a8a;">N</div>
-        <div class="mem-name">Nihara Randini Dayarathne</div>
-        <div class="mem-id">IT22581198</div>
-        <a class="mem-email" href="mailto:it22581198@my.sliit.lk">it22581198@my.sliit.lk</a>
-      </div>
-      <div class="mem">
-        <div class="mem-av" style="background:#9b2335;">L</div>
-        <div class="mem-name">Lakshi Tharushika</div>
-        <div class="mem-id">IT22570130</div>
-        <a class="mem-email" href="mailto:it22570130@my.sliit.lk">it22570130@my.sliit.lk</a>
-      </div>
-      <div class="mem">
-        <div class="mem-av" style="background:#1a6645;">S</div>
-        <div class="mem-name">Shashikala Beddegamage</div>
-        <div class="mem-id">IT22565112</div>
-        <a class="mem-email" href="mailto:it22565112@my.sliit.lk">it22565112@my.sliit.lk</a>
-      </div>
-      <div class="mem">
-        <div class="mem-av" style="background:#c8860a;">S</div>
-        <div class="mem-name">Shashikala Dilrukshi</div>
-        <div class="mem-id">IT22607850</div>
-        <a class="mem-email" href="mailto:it22607850@my.sliit.lk">it22607850@my.sliit.lk</a>
-      </div>
-    </div>
-    <div class="about-note">This project is conducted under the <strong style="font-weight:500;color:var(--dark);">Autonomous Intelligent Machines and Systems (AIMS)</strong> research group at SLIIT. Ethical clearance was obtained from SLIIT, with data collection support approved by the <strong style="font-weight:500;color:var(--dark);">Gem and Jewellery Research and Training Institute (GJRTI)</strong>. All data collected is strictly limited to research purposes and is non-commercial.</div>
-  </div>
-</section>
-
-<div class="divhr"></div>
-
-<!-- CONTACT US -->
+<!-- ═══════════════════ CONTACT ═══════════════════ -->
 <section id="contact">
-  <div class="sec reveal">
-    <div>
-      <div class="eyebrow">07 · Contact Us</div>
-      <h2 class="sec-title" style="color:var(--white);">Get in <em>Touch</em></h2>
-      <p class="c-p">We welcome collaborations, feedback, and questions about this research. Reach us via the form or through the contact details below.</p>
-      <div class="cdetail">
-        <div class="crow"><span class="clbl">Institution</span><span class="cval">SLIIT, Malabe, Sri Lanka</span></div>
-        <div class="crow"><span class="clbl">Department</span><span class="cval">Information Technology</span></div>
-        <div class="crow"><span class="clbl">Project ID</span><span class="cval">RP-25J-231</span></div>
-        <div class="crow"><span class="clbl">Research</span><span class="cval">AIMS Research Group</span></div>
-        <div class="crow"><span class="clbl">Supervisor</span><span class="cval">harshanath.s@sliit.lk</span></div>
-        <div class="crow"><span class="clbl">Portal</span><span class="cval">cdap.sliit.lk</span></div>
-        <div class="crow"><span class="clbl">GitHub</span><span class="cval"><a href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.7);text-decoration:none;">intelligent-gem-cutting-robot-arm-research ↗</a></span></div>
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="eyebrow">09 · Contact</div>
+      <h2 class="sec-title">Get in <em>Touch</em></h2>
+      <p style="font-size:0.95rem;line-height:1.9;color:rgba(255,255,255,0.38);font-weight:300;max-width:400px;margin-bottom:2.5rem;">We welcome collaboration inquiries, feedback on methodology, and questions about this research. Reach us through any of the channels below.</p>
+      <div class="cdetail" style="display:flex;flex-direction:column;">
+        <div class="ci-row"><span class="ci-label">Institution</span><span class="ci-val">SLIIT, Malabe, Sri Lanka</span></div>
+        <div class="ci-row"><span class="ci-label">Department</span><span class="ci-val">Information Technology</span></div>
+        <div class="ci-row"><span class="ci-label">Project ID</span><span class="ci-val">RP-25J-231</span></div>
+        <div class="ci-row"><span class="ci-label">Research Grp</span><span class="ci-val">AIMS Research Group</span></div>
+        <div class="ci-row"><span class="ci-label">Supervisor</span><span class="ci-val"><a href="mailto:harshanath.s@sliit.lk">harshanath.s@sliit.lk</a></span></div>
+        <div class="ci-row"><span class="ci-label">Portal</span><span class="ci-val">cdap.sliit.lk</span></div>
+        <div class="ci-row"><span class="ci-label">GitHub</span><span class="ci-val"><a href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">intelligent-gem-cutting-robot-arm-research ↗</a></span></div>
+        <div class="ci-row"><span class="ci-label">Hardware</span><span class="ci-val"><a href="https://github.com/Nihara-D/manipulator-hardware" target="_blank" rel="noopener">manipulator-hardware ↗</a></span></div>
+        <div class="ci-row"><span class="ci-label">Simulation</span><span class="ci-val"><a href="https://github.com/Nihara-D/manipulator-sim" target="_blank" rel="noopener">manipulator-sim ↗</a></span></div>
       </div>
     </div>
-    <div class="cform">
-      <div class="cfg"><label class="cflbl">Your Name</label><input class="cfinput" type="text" placeholder="Full name"></div>
-      <div class="cfg"><label class="cflbl">Email</label><input class="cfinput" type="email" placeholder="your@email.com"></div>
-      <div class="cfg"><label class="cflbl">Subject</label><input class="cfinput" type="text" placeholder="Research inquiry, collaboration…"></div>
-      <div class="cfg"><label class="cflbl">Message</label><textarea class="cftxt" placeholder="Write your message here…"></textarea></div>
-      <button class="cfbtn" onclick="this.textContent='Sent ✓';this.style.background='#1a6645';this.style.color='white';setTimeout(()=>{this.textContent='Send Message';this.style.background='';this.style.color='';},3000)">Send Message</button>
+
+    <div class="contact-form reveal reveal-delay-2">
+      <div class="cf-group"><label class="cf-label">Your Name</label><input class="cf-input" type="text" placeholder="Full name"></div>
+      <div class="cf-group"><label class="cf-label">Email</label><input class="cf-input" type="email" placeholder="your@email.com"></div>
+      <div class="cf-group"><label class="cf-label">Organisation</label><input class="cf-input" type="text" placeholder="University, company, or independent"></div>
+      <div class="cf-group"><label class="cf-label">Subject</label><input class="cf-input" type="text" placeholder="Research inquiry, collaboration, feedback…"></div>
+      <div class="cf-group"><label class="cf-label">Message</label><textarea class="cf-textarea" placeholder="Write your message here…"></textarea></div>
+      <button class="cf-btn" id="sendBtn" onclick="handleSend(this)">Send Message →</button>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="fl">💎 Intelligent Gem Cutting Robotic Arm · SLIIT 2024–2026</div>
-  <div style="display:flex;gap:1.4rem;align-items:center;">
-    <a href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener" style="font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.07em;color:rgba(255,255,255,0.35);text-decoration:none;display:flex;align-items:center;gap:0.35rem;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,255,255,0.35)"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
-      Full Project Repo
+  <div class="footer-links">
+    <a class="footer-link" href="https://github.com/Nihara-D/intelligent-gem-cutting-robot-arm-research" target="_blank" rel="noopener">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+      Main Repo
     </a>
-    <div class="fr">© 2024–2026 SLIIT AIMS Research Group · RP-25J-231</div>
+    <a class="footer-link" href="https://github.com/Nihara-D/manipulator-hardware" target="_blank" rel="noopener">Hardware</a>
+    <a class="footer-link" href="https://github.com/Nihara-D/manipulator-sim" target="_blank" rel="noopener">Simulation</a>
   </div>
+  <div class="fr">© 2024–2026 SLIIT AIMS Research Group · RP-25J-231</div>
 </footer>
 
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
 <script>
-// Reveal on scroll
-const els = document.querySelectorAll('.reveal');
-const io = new IntersectionObserver(entries => {
-  entries.forEach((e,i) => {
-    if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('show'), i*60); io.unobserve(e.target); }
+/* ─── CUSTOM CURSOR ─── */
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.transform=`translate(${mx-6}px,${my-6}px)`;
+});
+function animRing(){
+  rx+=(mx-rx-20)*0.12;ry+=(my-ry-20)*0.12;
+  cursorRing.style.transform=`translate(${rx}px,${ry}px)`;
+  requestAnimationFrame(animRing);
+}animRing();
+document.querySelectorAll('a,button,.ms-tab,.team-card,.mod-card,.doc-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='20px';cursor.style.height='20px';
+    cursor.style.background='var(--top-xl)';
+    cursorRing.style.width='60px';cursorRing.style.height='60px';
   });
-}, {threshold:0.07});
-els.forEach(el => io.observe(el));
-
-// Active nav link
-const secs = document.querySelectorAll('section[id]');
-const links = document.querySelectorAll('.nav-links a');
-window.addEventListener('scroll', () => {
-  let cur='';
-  secs.forEach(s=>{ if(window.scrollY >= s.offsetTop-130) cur=s.id; });
-  links.forEach(a=>{ a.classList.toggle('active', a.getAttribute('href')==='#'+cur); });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='12px';cursor.style.height='12px';
+    cursor.style.background='var(--sap-xl)';
+    cursorRing.style.width='40px';cursorRing.style.height='40px';
+  });
 });
 
-// Milestone dropdown
-function showMilestone(val) {
-  document.querySelectorAll('.ms-panel').forEach(p => p.classList.remove('active'));
-  if(!val) return;
-  const panel = document.getElementById('panel-' + val);
-  if(panel) panel.classList.add('active');
+/* ─── SCROLL PROGRESS ─── */
+window.addEventListener('scroll',()=>{
+  const pct=window.scrollY/(document.body.scrollHeight-window.innerHeight)*100;
+  document.getElementById('scroll-progress').style.width=pct+'%';
+});
+
+/* ─── REVEAL ON SCROLL ─── */
+const revealEls=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('show'),i*55);
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.07});
+revealEls.forEach(el=>io.observe(el));
+
+/* ─── ACTIVE NAV ─── */
+const secs=document.querySelectorAll('section[id]');
+const links=document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(window.scrollY>=s.offsetTop-140)cur=s.id;});
+  links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+
+/* ─── MILESTONE TABS ─── */
+function switchTab(id,btn){
+  document.querySelectorAll('.ms-content').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ms-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
 }
 
-// Click on overview card to show detail
-function selectMs(id) {
-  const sel = document.getElementById('msSelect');
-  sel.value = id;
-  showMilestone(id);
-  document.getElementById('milestones').scrollIntoView({behavior:'smooth'});
+/* ─── SEND BUTTON ─── */
+function handleSend(btn){
+  btn.textContent='Sending…';btn.style.opacity='0.7';
+  setTimeout(()=>{
+    btn.textContent='Message Sent ✓';btn.style.background='var(--em-xl)';
+    setTimeout(()=>{btn.textContent='Send Message →';btn.style.background='';btn.style.opacity='';},3000);
+  },1200);
 }
+
+/* ─── GEM TOOLTIP ON CANVAS ─── */
+const tooltip=document.getElementById('gemTooltip');
+document.addEventListener('mousemove',e=>{
+  tooltip.style.left=e.clientX+18+'px';tooltip.style.top=e.clientY-10+'px';
+});
+
+/* ─── FALLING GEMS CANVAS ─── */
+const canvas=document.getElementById('gemCanvas');
+const ctx=canvas.getContext('2d');
+let W,H,gems=[];
+
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+window.addEventListener('resize',()=>{resize();});
+resize();
+
+const GEM_TYPES=[
+  {name:'Sapphire',   colors:['#1e4fa8','#4a80e0','#7aaef8','#b8d8ff'], glow:'rgba(122,174,248,0.6)'},
+  {name:'Ruby',       colors:['#8b1a2a','#c83050','#f07090','#ffc0c8'], glow:'rgba(240,112,144,0.6)'},
+  {name:'Emerald',    colors:['#0e5a38','#1a9060','#4abe88','#b0f0d0'], glow:'rgba(74,190,136,0.6)'},
+  {name:'Topaz',      colors:['#b87800','#e0a820','#f8d060','#fff0b0'], glow:'rgba(248,208,96,0.6)'},
+  {name:'Amethyst',   colors:['#5a1a8a','#9040c8','#c880f0','#f0c8ff'], glow:'rgba(200,128,240,0.6)'},
+  {name:'Moonstone',  colors:['#6080a8','#90b0d8','#c0d8f8','#e8f0ff'], glow:'rgba(192,216,248,0.6)'},
+  {name:'Spinel',     colors:['#a03060','#d06090','#f0a0c0','#ffd8e8'], glow:'rgba(240,160,192,0.6)'},
+  {name:'Alexandrite',colors:['#405880','#7090c8','#a8c0f0','#d8e8ff'], glow:'rgba(168,192,240,0.6)'},
+];
+
+// Gem shapes: polygon point sets (normalized -1 to 1)
+const SHAPES={
+  brilliant:[
+    [0,-.85],[.52,-.32],[.85,.12],[.62,.7],[0,.95],[-.62,.7],[-.85,.12],[-.52,-.32]
+  ],
+  hexagon:[
+    [0,-1],[.87,-.5],[.87,.5],[0,1],[-.87,.5],[-.87,-.5]
+  ],
+  marquise:[
+    [0,-1],[.5,-.3],[.7,.1],[.5,.5],[0,.9],[-.5,.5],[-.7,.1],[-.5,-.3]
+  ],
+  pear:[
+    [0,-1],[.45,-.2],[.6,.2],[.45,.65],[0,.95],[-.45,.65],[-.6,.2],[-.45,-.2]
+  ],
+  heart:[
+    [0,.9],[-.7,.3],[-.8,-.1],[-.55,-.5],[-.2,-.8],[0,-.6],[.2,-.8],[.55,-.5],[.8,-.1],[.7,.3]
+  ],
+  diamond:[
+    [0,-1],[.6,0],[0,.8],[-.6,0]
+  ],
+  octagon:[
+    [0,-.9],[.55,-.55],[.9,0],[.55,.55],[0,.9],[-.55,.55],[-.9,0],[-.55,-.55]
+  ],
+};
+const SHAPE_KEYS=Object.keys(SHAPES);
+
+function createGem(){
+  const type=GEM_TYPES[Math.floor(Math.random()*GEM_TYPES.length)];
+  const shape=SHAPE_KEYS[Math.floor(Math.random()*SHAPE_KEYS.length)];
+  const size=Math.random()*18+8;
+  return{
+    x:Math.random()*W,
+    y:-60-Math.random()*200,
+    vx:(Math.random()-.5)*0.8,
+    vy:Math.random()*1.2+0.4,
+    rot:Math.random()*Math.PI*2,
+    rotV:(Math.random()-.5)*0.025,
+    size,
+    type,shape,
+    alpha:0,
+    alphaV:Math.random()*0.008+0.004,
+    maxAlpha:Math.random()*0.55+0.25,
+    sparkling:false,
+    sparkTimer:0,
+    sparkInterval:Math.random()*180+60,
+    pulse:0,
+    trail:[],
+  };
+}
+
+for(let i=0;i<65;i++){
+  const g=createGem();
+  g.y=Math.random()*H; // spread initial
+  g.alpha=Math.random()*g.maxAlpha;
+  gems.push(g);
+}
+
+function drawGemShape(ctx,pts,size,rot){
+  ctx.beginPath();
+  for(let i=0;i<pts.length;i++){
+    const [px,py]=pts[i];
+    const x=px*size*Math.cos(rot)-py*size*Math.sin(rot);
+    const y=px*size*Math.sin(rot)+py*size*Math.cos(rot);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+}
+
+function drawGem(g){
+  const pts=SHAPES[g.shape];
+  ctx.save();
+  ctx.translate(g.x,g.y);
+
+  // Trail
+  if(g.trail.length>1){
+    ctx.beginPath();
+    ctx.moveTo(g.trail[0].x-g.x,g.trail[0].y-g.y);
+    for(let t=1;t<g.trail.length;t++){
+      ctx.lineTo(g.trail[t].x-g.x,g.trail[t].y-g.y);
+    }
+    ctx.strokeStyle=g.type.glow.replace('0.6','0.08');
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+  }
+
+  // Glow
+  const glowR=g.size*2.5+g.pulse*4;
+  const grd=ctx.createRadialGradient(0,0,0,0,0,glowR);
+  grd.addColorStop(0,g.type.glow.replace('0.6',String(g.alpha*0.5)));
+  grd.addColorStop(1,'transparent');
+  ctx.fillStyle=grd;
+  ctx.beginPath();ctx.arc(0,0,glowR,0,Math.PI*2);ctx.fill();
+
+  // Main body fill
+  const bodyGrd=ctx.createLinearGradient(0,-g.size,0,g.size);
+  bodyGrd.addColorStop(0,g.type.colors[0]+(Math.round(g.alpha*255)).toString(16).padStart(2,'0'));
+  bodyGrd.addColorStop(0.4,g.type.colors[1]+(Math.round(g.alpha*220)).toString(16).padStart(2,'0'));
+  bodyGrd.addColorStop(0.7,g.type.colors[2]+(Math.round(g.alpha*180)).toString(16).padStart(2,'0'));
+  bodyGrd.addColorStop(1,g.type.colors[3]+(Math.round(g.alpha*120)).toString(16).padStart(2,'0'));
+
+  drawGemShape(ctx,pts,g.size,g.rot);
+  ctx.fillStyle=bodyGrd;
+  ctx.fill();
+
+  // Edge stroke
+  drawGemShape(ctx,pts,g.size,g.rot);
+  ctx.strokeStyle=g.type.colors[2]+(Math.round(g.alpha*200)).toString(16).padStart(2,'0');
+  ctx.lineWidth=0.8;
+  ctx.stroke();
+
+  // Inner facet lines
+  ctx.globalAlpha=g.alpha*0.25;
+  ctx.strokeStyle=g.type.colors[3];
+  ctx.lineWidth=0.4;
+  for(let i=0;i<pts.length;i++){
+    const [px,py]=pts[i];
+    const x=px*g.size*Math.cos(g.rot)-py*g.size*Math.sin(g.rot);
+    const y=px*g.size*Math.sin(g.rot)+py*g.size*Math.cos(g.rot);
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(x,y);ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+
+  // Sparkle
+  if(g.sparkling){
+    const sp=g.sparkTimer/15;
+    const sSz=g.size*0.5*Math.sin(sp*Math.PI);
+    ctx.fillStyle=`rgba(255,255,255,${g.alpha*Math.sin(sp*Math.PI)*0.9})`;
+    for(let d=0;d<4;d++){
+      const a=d*(Math.PI/2)+g.rot;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(Math.cos(a)*sSz,Math.sin(a)*sSz);
+      ctx.lineTo(Math.cos(a+0.15)*sSz*0.3,Math.sin(a+0.15)*sSz*0.3);
+      ctx.closePath();ctx.fill();
+    }
+  }
+
+  ctx.restore();
+}
+
+let frame=0;
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  frame++;
+
+  gems.forEach((g,i)=>{
+    // Trail
+    g.trail.push({x:g.x,y:g.y});
+    if(g.trail.length>8)g.trail.shift();
+
+    g.x+=g.vx;
+    g.y+=g.vy;
+    g.rot+=g.rotV;
+
+    // Drift side
+    g.vx+=Math.sin(frame*0.008+i)*0.003;
+    g.vx=Math.max(-1.5,Math.min(1.5,g.vx));
+
+    // Alpha fade in
+    if(g.alpha<g.maxAlpha)g.alpha+=g.alphaV;
+
+    // Sparkle
+    g.sparkTimer++;
+    if(!g.sparkling&&g.sparkTimer>g.sparkInterval){g.sparkling=true;g.sparkTimer=0;}
+    if(g.sparkling&&g.sparkTimer>15){g.sparkling=false;g.sparkTimer=0;g.sparkInterval=Math.random()*180+60;}
+
+    // Pulse
+    g.pulse=Math.sin(frame*0.04+i)*0.5+0.5;
+
+    drawGem(g);
+
+    // Reset if off screen
+    if(g.y>H+80||g.x<-80||g.x>W+80){
+      const ng=createGem();
+      gems[i]=ng;
+    }
+  });
+
+  // Occasionally add extra gems
+  if(frame%120===0&&gems.length<80){gems.push(createGem());}
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Mouse interaction: repel gems
+document.addEventListener('mousemove',e=>{
+  gems.forEach(g=>{
+    const dx=g.x-e.clientX,dy=g.y-e.clientY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<80){
+      const force=(80-dist)/80;
+      g.vx+=dx/dist*force*1.2;
+      g.vy+=dy/dist*force*0.8;
+    }
+  });
+});
+
+// Gem tooltip on hover
+canvas.addEventListener('mousemove',e=>{
+  let found=null;
+  gems.forEach(g=>{
+    const dx=g.x-e.clientX,dy=g.y-e.clientY;
+    if(Math.sqrt(dx*dx+dy*dy)<g.size*1.5)found=g;
+  });
+  if(found){
+    tooltip.style.opacity='1';
+    tooltip.textContent=`${found.type.name} · ${found.shape}`;
+  }else{
+    tooltip.style.opacity='0';
+  }
+});
 </script>
 </body>
 </html>
